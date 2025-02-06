@@ -37,10 +37,6 @@ lectin_binding_motif = {
 
 metric_df_ = {}
 for lectin, properties in lectin_binding_motif.items():
-    print("")
-    print(f"Processing lectin: {lectin}")
-    print(f"Motif: {properties['motif']}")
-    print(f"Termini: {properties['termini_list']}")
 
     metric_df_[lectin] = metric_df(lectin,properties)
     plot_Binding_vs_Flexibility_and_SASA_with_stats(metric_df_[lectin], lectin, properties["motif"])
