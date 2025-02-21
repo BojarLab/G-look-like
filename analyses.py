@@ -1,5 +1,5 @@
 from functions import metric_df
-from functions import plot_Binding_vs_Flexibility_and_SASA_with_stats
+from functions import plot_Binding_vs_Flexibility_and_SASA_with_stats, analyze_all_lectins
 
 lectin_binding_motif = {
     "AOL": { "motif": ["Fuc"],
@@ -270,7 +270,7 @@ lectin_binding_motif = {
     }
 }
 
-metric_df_ = {}
+metrics = {}
 
 for lectin, properties in lectin_binding_motif.items():
     print(f"\nProcessing lectin: {lectin}")
@@ -283,5 +283,7 @@ for lectin, properties in lectin_binding_motif.items():
         print(f"⚠️ Skipping {lectin} due to missing binding data.")
         continue
 
-    metric_df_[lectin] = df
-    plot_Binding_vs_Flexibility_and_SASA_with_stats(metric_df_[lectin], lectin, properties["motif"])
+    metrics[lectin] = df
+    #plot_Binding_vs_Flexibility_and_SASA_with_stats(metrics[lectin], lectin, properties["motif"])
+
+stats= analyze_all_lectins(metrics)

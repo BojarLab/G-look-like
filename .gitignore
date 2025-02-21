@@ -1,2 +1,4 @@
 /data/
-/results/
+/results/plots
+/results/metric_df
+

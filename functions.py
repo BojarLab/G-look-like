@@ -11,6 +11,7 @@ import glycontact
 
 import matplotlib.pyplot as plt
 from scipy.stats import linregress
+import pandas as pd
 import seaborn as sns
 import networkx as nx
 import os
@@ -348,3 +349,150 @@ def plot_Binding_vs_Flexibility_and_SASA_with_stats(metric_df, lectin, binding_m
 
     # Show the plots
     plt.show()
+
+
+def analyze_all_lectins(metric_df_dict):
+    """
+    Analyzes the correlation between Binding Score and SASA/Flexibility for all lectins,
+    groups them by correlation status (Positive, Negative, Not Significant),
+    and saves results to a single Excel file.
+
+    Args:
+        metric_df_dict (dict): Dictionary where keys are lectin names and values are metric DataFrames.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing all lectins with their p-values and correlation status.
+    """
+    results = []
+
+    for lectin, metric_df in metric_df_dict.items():
+
+        # Compute regression for SASA vs Binding Score
+        sasa = metric_df["SASA"]
+        binding = metric_df["binding_score"]
+        slope_sasa, _, _, p_value_sasa, _ = linregress(sasa, binding)
+
+        # Compute regression for Flexibility vs Binding Score
+        flex = metric_df["flexibility"]
+        slope_flex, _, _, p_value_flex, _ = linregress(flex, binding)
+
+        # Determine correlation status for SASA
+        correlation_status_sasa = (
+            "Positive Correlation" if p_value_sasa < 0.05 and slope_sasa > 0 else
+            "Negative Correlation" if p_value_sasa < 0.05 and slope_sasa < 0 else
+            "Not Significant"
+        )
+
+        # Determine correlation status for Flexibility
+        correlation_status_flex = (
+            "Positive Correlation" if p_value_flex < 0.05 and slope_flex > 0 else
+            "Negative Correlation" if p_value_flex < 0.05 and slope_flex < 0 else
+            "Not Significant"
+        )
+
+        # Append results for SASA and Flexibility (only if significant)
+        if correlation_status_sasa != "Not Significant":
+            results.append({"Lectin": lectin, "p-value": p_value_sasa, "Correlation Status": correlation_status_sasa,
+                            "Type": "SASA"})
+
+        if correlation_status_flex != "Not Significant":
+            results.append({"Lectin": lectin, "p-value": p_value_flex, "Correlation Status": correlation_status_flex,
+                            "Type": "Flexibility"})
+
+        # Create DataFrame
+    results_df = pd.DataFrame(results)
+
+    # Rank lectins within each correlation group by p-value (ascending order)
+    results_df["Rank"] = results_df.groupby("Correlation Status")["p-value"].rank(method="min", ascending=True)
+
+    # Set "Correlation Status" as the index to group in one file
+    results_df.set_index("Correlation Status", inplace=True)
+
+    # Save to a single Excel file
+    excel_filename = "results/stats/all_lectin_correlation.xlsx"
+    results_df.to_excel(excel_filename)
+
+    return results_df
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
+def perform_pca_on_lectins(results_df):
+    """
+    Performs PCA on the ranked lectin correlation data and visualizes
+    positive and negative correlations in a 2D PCA plot.
+
+    Args:
+        results_df (pd.DataFrame): DataFrame containing lectins, p-values, and correlation status.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing PCA results.
+    """
+    # Reset index to get "Correlation Status" as a column
+    results_df = results_df.reset_index()
+
+    # Ensure Rank column exists
+    if "Rank" not in results_df.columns:
+        print("⚠️ 'Rank' column not found. Assigning default rank based on p-value.")
+        results_df["Rank"] = results_df.groupby("Correlation Status")["p-value"].rank(method="min", ascending=True)
+
+    # Encode correlation status numerically
+    correlation_mapping = {"Positive Correlation": 1, "Negative Correlation": -1}
+    results_df["Correlation Code"] = results_df["Correlation Status"].map(correlation_mapping)
+
+    # Select features for PCA
+    pca_features = ["p-value", "Rank"]
+    if not set(pca_features).issubset(results_df.columns):
+        print("❌ Required columns missing for PCA. Skipping PCA analysis.")
+        return results_df  # Return without PCA if required columns are missing
+
+    data_for_pca = results_df[pca_features]
+
+    # Standardize the features
+    scaler = StandardScaler()
+    data_scaled = scaler.fit_transform(data_for_pca)
+
+    # Perform PCA
+    pca = PCA(n_components=2)
+    pca_result = pca.fit_transform(data_scaled)
+
+    # Add PCA results to DataFrame
+    results_df["PCA1"] = pca_result[:, 0]
+    results_df["PCA2"] = pca_result[:, 1]
+
+    # Create PCA plot
+    plt.figure(figsize=(10, 6))
+    sns.scatterplot(
+        x=results_df["PCA1"],
+        y=results_df["PCA2"],
+        hue=results_df["Correlation Status"],
+        palette={"Positive Correlation": "blue", "Negative Correlation": "red"},
+        style=results_df["Type"],
+        s=100,
+        alpha=0.8
+    )
+
+    # Annotate points with Lectin names
+    for i, row in results_df.iterrows():
+        plt.text(row["PCA1"], row["PCA2"], row["Lectin"], fontsize=9, ha='right')
+
+    # Labels and title
+    plt.xlabel("Principal Component 1 (PCA1)")
+    plt.ylabel("Principal Component 2 (PCA2)")
+    plt.title("PCA of Lectin Correlation Analysis")
+
+    # Show plot
+    plt.legend(title="Correlation Status")
+    plt.grid(True)
+    plt.show()
+
+    return results_df
+
+# Perform PCA on the generated results
+pca_results_df = perform_pca_on_lectins(results_df)
+
+# Display the final DataFrame after PCA
+import ace_tools as tools
+tools.display_dataframe_to_user(name="PCA Results for Lectin Correlation", dataframe=pca_results_df)
