@@ -197,7 +197,7 @@ lectin_binding_motif = {
         "termini_list": [["t"], ["t"]]
     },
     "ECA": {
-        "motif": ["LacNAc"],
+        "motif": ["Gal(b1-4)GlcNAc"],
         "termini_list": [["t"]]
     },
     "GS-I": {
@@ -205,12 +205,12 @@ lectin_binding_motif = {
         "termini_list": [["t"], ["t"]]
     },
     "LEA": {
-        "motif": ["LacNAc"],
-        "termini_list": [["t"]]
+        "motif": ["Gal(b1-4)GlcNAc"],
+        "termini_list": [["t", "f"]]
     },
     "LEL": {
-        "motif": ["LacNAc"],
-        "termini_list": [["t"]]
+        "motif": ["Gal(b1-4)GlcNAc"],
+        "termini_list": [["t", "f"]]
     },
     "MOA": {
         "motif": ["Gal(a1-3)Gal", "Gal(a1-3)GalNAc"],
@@ -225,24 +225,24 @@ lectin_binding_motif = {
         "termini_list": [["t"]]
     },
     "RCA-I": {
-        "motif": ["LacNAc"],
-        "termini_list": [["t"]]
+        "motif": ["Gal(b1-4)GlcNAc"],
+        "termini_list": [["t", "f"]]
     },
     "RCA120": {
-        "motif": ["LacNAc"],
-        "termini_list": [["t"]]
+        "motif": ["Gal(b1-4)GlcNAc"],
+        "termini_list": [["t", "f"]]
     },
     "SJA": {
-        "motif": ["LacNAc"],
-        "termini_list": [["t"]]
+        "motif": ["Gal(b1-4)GlcNAc"],
+        "termini_list": [["t", "f"]]
     },
     "STA": {
-        "motif": ["LacNAc"],
-        "termini_list": [["t"]]
+        "motif": ["Gal(b1-4)GlcNAc"],
+        "termini_list": [["t", "f"]]
     },
     "STL": {
-        "motif": ["LacNAc"],
-        "termini_list": [["t"]]
+        "motif": ["Gal(b1-4)GlcNAc"],
+        "termini_list": [["t", "f"]]
     },
     "CSA": {
         "motif": ["GalNAc"],
@@ -257,12 +257,12 @@ lectin_binding_motif = {
         "termini_list": [["t"]]
     },
     "VVL": {
-        "motif": ["LacdiNAc", "GalNAc"],
-        "termini_list": [["t"], ["t"]]
+        "motif": ["GalNAc(b3-4)GlcNAc", "GalNAc"],
+        "termini_list": [["t", "f"], ["t"]]
     },
     "VVA": {
-        "motif": ["LacdiNAc", "GalNAc"],
-        "termini_list": [["t"], ["t"]]
+        "motif": ["GalNAc(b3-4)GlcNAc", "GalNAc"],
+        "termini_list": [["t",  "f"], ["t"]]
     },
     "WFA": {
         "motif": ["GalNAc"],
@@ -284,6 +284,6 @@ for lectin, properties in lectin_binding_motif.items():
         continue
 
     metrics[lectin] = df
-    #plot_Binding_vs_Flexibility_and_SASA_with_stats(metrics[lectin], lectin, properties["motif"])
+    plot_Binding_vs_Flexibility_and_SASA_with_stats(metrics[lectin], lectin, properties["motif"])
 
 stats= analyze_all_lectins(metrics)

@@ -47,7 +47,7 @@ def load_data():
         # Create a mapping dictionary {target -> protein}
         target_to_protein = dict(zip(df_map["target"], df_map["protein"]))
 
-        # Apply mapping to create the "protein" column in df_target
+        # ƒApply mapping to create the "protein" column in df_target
         df_target["protein"] = df_target["target"].map(target_to_protein)
 
         return df_target
