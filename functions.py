@@ -387,9 +387,9 @@ def analyze_all_lectins(metric_df_dict):
     for lectin, metric_df in metric_df_dict.items():
 
         # Compute regression for SASA vs Binding Score
-        #sasa = metric_df["SASA"]
+        sasa = metric_df["SASA"]
         #sasa = metric_df["sum_SASA"]
-        sasa = metric_df["max_SASA"]
+        #sasa = metric_df["max_SASA"]
 
         binding = metric_df["binding_score"]
         slope_sasa, _, _, p_value_sasa, _ = linregress(sasa, binding)
@@ -427,11 +427,13 @@ def analyze_all_lectins(metric_df_dict):
     # Rank lectins within each correlation group by p-value (ascending order)
     results_df["Rank"] = results_df.groupby("Correlation Status")["p-value"].rank(method="min", ascending=True)
 
+    results_df = results_df.sort_values(by="Rank", ascending=True)
+
     # Set "Correlation Status" as the index to group in one file
     results_df.set_index("Correlation Status", inplace=True)
 
     # Save to a single Excel file
-    excel_filename = "results/stats/all_lectin_correlation_max_SASA.xlsx"
+    excel_filename = "results/stats/all_lectin_correlation_mean_SASA.xlsx"
     results_df.to_excel(excel_filename)
 
     return results_df
