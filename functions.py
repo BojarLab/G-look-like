@@ -87,6 +87,21 @@ def compute_overall_SASA(SASA_values):
     return sum(SASA_values) / len(SASA_values) if SASA_values else None
 
 
+def compute_SASA_stats(SASA_values):
+    if not SASA_values:  # Check if list is empty
+        return None, None, None
+
+    sasa_sum = sum(SASA_values)
+    sasa_mean = sasa_sum / len(SASA_values)
+    sasa_max = max(SASA_values)
+
+    return {
+        "sasa_mean": sasa_mean,
+        "sasa_max": sasa_max,
+        "sasa_sum": sasa_sum
+    }
+
+
 def compute_overall_flexibility(flexibility_values):
     return sum(flexibility_values) / len(flexibility_values) if flexibility_values else None
 
@@ -204,6 +219,8 @@ def generate_metrics_for_glycan(properties: str,
 
         if matching_monosaccharides:
             overall_SASA = compute_overall_SASA(SASA)
+
+
             overall_flexibility = compute_overall_flexibility(flexibility)
             overall_Q = compute_overall_Q(Q)
             overall_theta = compute_overall_theta(theta)
@@ -212,7 +229,9 @@ def generate_metrics_for_glycan(properties: str,
             metric_data.append({
                 "glycan": glycan,
                 "binding_score": binding_score,
-                "SASA": overall_SASA,
+                "SASA": overall_SASA, #,sasa_mean
+                "sum_SASA" :compute_SASA_stats(SASA)["sasa_sum"],
+                "max_SASA"  :compute_SASA_stats(SASA)["sasa_max"],
                 "flexibility": overall_flexibility,
                 "Q": overall_Q,
                 "theta": overall_theta,
@@ -368,7 +387,10 @@ def analyze_all_lectins(metric_df_dict):
     for lectin, metric_df in metric_df_dict.items():
 
         # Compute regression for SASA vs Binding Score
-        sasa = metric_df["SASA"]
+        #sasa = metric_df["SASA"]
+        #sasa = metric_df["sum_SASA"]
+        sasa = metric_df["max_SASA"]
+
         binding = metric_df["binding_score"]
         slope_sasa, _, _, p_value_sasa, _ = linregress(sasa, binding)
 
@@ -409,7 +431,7 @@ def analyze_all_lectins(metric_df_dict):
     results_df.set_index("Correlation Status", inplace=True)
 
     # Save to a single Excel file
-    excel_filename = "results/stats/all_lectin_correlation.xlsx"
+    excel_filename = "results/stats/all_lectin_correlation_max_SASA.xlsx"
     results_df.to_excel(excel_filename)
 
     return results_df
