@@ -1,23 +1,9 @@
-
 import pickle
-from typing import Dict
-import numpy as np
-import pandas as pd
+from typing import Dic
 from glycowork.motif.graph import compare_glycans, subgraph_isomorphism
-from glycowork.motif.processing import get_class
-import sys
-from networkx.classes import Graph
 import importlib.resources as pkg_resources
 import glycontact
-
-import matplotlib.pyplot as plt
-from scipy.stats import linregress
-import pandas as pd
-import seaborn as sns
 import networkx as nx
-import os
-from scipy.stats import pearsonr, spearmanr
-
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -308,7 +294,7 @@ def metric_df(lectin, properties):
     Now also returns glycans suitable for aggregation testing.
     """
     # Create necessary directories if they don't exist
-    os.makedirs('results/metric_df', exist_ok=True)
+    os.makedirs('results/glycan_metric', exist_ok=True)
     os.makedirs('results/agg_test', exist_ok=True)
 
     def load_data():
