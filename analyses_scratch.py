@@ -1,4 +1,16 @@
 from scripts.metric_df import metric_df
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),  # Outputs to console
+        # Optional file handler:
+        # logging.FileHandler('glycan_processing.log')
+    ]
+)
 
 lectin_binding_motif = {
     "AOL": { "motif": ["Fuc(a1-?)"],
