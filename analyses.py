@@ -313,11 +313,10 @@ lectin_binding_motif = {
 }
 
 # Process the metrics with specific aggregation methods
-filtered_metrics, all_metrics = process_lectin_motifs(lectin_binding_motif, within=np.nansum, btw=np.nanmax)
+filtered_metrics, all_metrics = process_lectin_motifs(lectin_binding_motif, within=np.nansum, btw=np.nansum)
 
 # Analyze binding correlations
 correlation_results = analyze_binding_correlations(filtered_metrics)
-correlation_results.to_excel('results/stats/lectin_binding_correlation_analysis_sum_max.xlsx', index=False)
+correlation_results.to_excel('results/stats/lectin_binding_correlation_analysis_sum_sum.xlsx', index=False)
 
-# Collect correlation statistics with the same aggregation methods
-collect_correlation_statistics(filtered_metrics, within=np.nansum, btw=np.nanmax)
+collect_correlation_statistics(filtered_metrics, within=np.nansum, btw=np.nansum)

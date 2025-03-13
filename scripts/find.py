@@ -1,7 +1,10 @@
+import pandas as pd
 from glycowork.motif.graph import compare_glycans, subgraph_isomorphism
 from collections import defaultdict
 import logging
-
+import numpy as np
+from glycowork.motif.graph import glycan_to_nxGraph
+import networkx as nx
 logger = logging.getLogger(__name__)
 
 def find_matching_glycan(flex_data, glycan):
@@ -11,80 +14,86 @@ def find_matching_glycan(flex_data, glycan):
             return glycan
     return None
 
-
-def find_matching_motif_nodes(glycan_id: str, properties: dict) -> tuple:
+def magic(glycan_id: str, properties: dict, flex_data: dict[str, nx.Graph],
+          within, btw) -> pd.DataFrame:
     """
-    Identifies nodes in a glycan that match specified binding motifs.
+    Generate metrics for a glycan based on motif matching.
 
-    Args:
-        glycan_id (str): Identifier of the glycan to analyze.
-        properties (dict): Dictionary containing motifs and terminal residues.
+    Parameters:
+    -----------
+    glycan_id : str
+        The ID of the glycan to analyze
+    properties : dict
+        Dictionary containing motif and termini information
+    flex_data : dict[str, nx.Graph]
+        Dictionary mapping glycan IDs to their NetworkX graph representations
+    within : function, default=np.nansum
+        Function to aggregate values within a match (options: np.nansum, np.nanmean, np.nanmax)
+    btw : function, default=np.mean
+        Function to aggregate values between matches (options: np.sum, np.mean, np.max)
 
     Returns:
-        tuple: (
-            list[list[int]]: Lists of matched nodes for each successful motif,
-            list[str]: Successfully matched motifs
-        )
+    --------
+    pd.DataFrame or None
+        DataFrame containing the metrics if a match is found, None otherwise
     """
-    # Initialize result containers
-    motif_nodes = []
-    matched_motifs = []
-
-    # Extract motifs and their terminal residues
     motifs = properties.get("motif", [])
     termini_list = properties.get("termini_list", [])
 
-    # Process each motif with its corresponding termini
-    for motif, termini in zip(motifs, termini_list):
+    for i, motif in enumerate(motifs):
         try:
-            # Check if motif is present in the glycan
-            is_present, motif_nodes = subgraph_isomorphism(
-                glycan_id, motif,
-                return_matches=True,
-                termini_list=termini)
+            # Get the specific termini for this motif
+            if i < len(termini_list):
+                termini = termini_list[i]
+            else:
+                print(f"Warning: No termini found for motif {motif}")
+                termini = []
+
+            # Pass only the specific termini for this motif
+            motif_graph = glycan_to_nxGraph(motif, termini='provided', termini_list=termini)
+            glycan_graph = flex_data.get(glycan_id)
+
+            if glycan_graph is None:
+                print(f"Warning: No graph found for glycan {glycan_id}")
+                continue
+
+            is_present, matches = subgraph_isomorphism(glycan_graph, motif_graph,
+                                                       return_matches=True)
             if not is_present:
                 continue
-        except Exception:
+
+            sasa, flex, mono = [], [], []
+            for m in matches:
+                # Collect monosaccharide information
+                mono.append([glycan_graph.nodes()[n].get('Monosaccharide', "") for n in m])
+
+                # Apply the within-match aggregation function
+                sasa.append(within([glycan_graph.nodes()[n].get('SASA', np.nan) for n in m]))
+                flex.append(within([glycan_graph.nodes()[n].get('flexibility', np.nan) for n in m]))
+
+            # Apply the between-match aggregation function
+            final_sasa = btw(sasa)
+            final_flex = btw(flex)
+
+            # Convert motif to string if it's a list to avoid unhashable type error
+            motif_value = str(motif) if isinstance(motif, list) else motif
+
+            # Create a DataFrame with the results
+            magic_df = pd.DataFrame({
+                "glycan": glycan_id,
+                "SASA": [final_sasa],
+                "flexibility": [final_flex],
+                "monosaccharides": [mono],
+                "motifs": [motif_value],
+                # Add information about the aggregation methods used
+                "within_method": [within.__name__],
+                "between_method": [btw.__name__]
+            })
+
+            return magic_df
+
+        except Exception as e:
+            print(f"Error processing motif {motif}: {e}")
             continue
 
-        matched_motifs.append(motif)
-
-    return  motif_nodes, matched_motifs
-
-
-def find_motif_mono_nodes(nodes, graph):
-    """Filter to keep only monosaccharide nodes.
-    Nested structure preserved.
-    matched_motif= "Fuc(a1-2)GalNAc", Fuc(a1-2)GalNAc"
-    motif_nodes = [[0, 1, 2], [4, 5, 6]]
-    mono_nodes= [[0,2], [4,6]]
-     """
-    return [
-        [node for node in part if node in graph.nodes and node % 2 == 0]
-        for part in nodes
-    ]
-
-
-def find_node_attr(graph, node_lists):
-    """Extract attributes from nodes."""
-    all_attrs = []
-
-    # Check if node_lists is a flat list of integers or a nested list
-    if node_lists and not isinstance(node_lists[0], list):
-        # If it's a flat list, wrap it in another list to make it nested
-        node_lists = [node_lists]
-
-    for part in node_lists:
-        attrs = defaultdict(list)
-        for node in part:
-            try:
-                node_attr = graph.nodes[node]
-                mono = node_attr.get('Monosaccharide', "")
-                if mono:
-                    attrs["monos"].append(mono)
-                    attrs["sasa"].append(node_attr.get("SASA", 0))
-                    attrs["flex"].append(node_attr.get("flexibility", 0))
-            except Exception as e:
-                logger.error(f"Error extracting attributes: {e}")
-        all_attrs.append(dict(attrs))
-    return all_attrs
+    return None
