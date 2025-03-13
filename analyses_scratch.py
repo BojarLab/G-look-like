@@ -1,7 +1,9 @@
-from scripts.metric_df import metric_df
+from scripts.process_lectins import process_lectin_motifs
+from scripts.analyse_agg import analyze_binding_correlations, collect_correlation_statistics
 import logging
-
-# Configure logging
+import re
+import pandas as pd
+import numpy as np
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -11,6 +13,8 @@ logging.basicConfig(
         # logging.FileHandler('glycan_processing.log')
     ]
 )
+
+
 
 lectin_binding_motif = {
     "AOL": { "motif": ["Fuc(a1-?)"],
@@ -308,13 +312,12 @@ lectin_binding_motif = {
     }
 }
 
-metrics = {}
+# Process the metrics with specific aggregation methods
+filtered_metrics, all_metrics = process_lectin_motifs(lectin_binding_motif, within=np.nansum, btw=np.nanmax)
 
-for lectin, properties in lectin_binding_motif.items():
-    print(f"\nProcessing lectin: {lectin}")
-    print(f"Motif: {properties['motif']}")
-    df = metric_df(lectin, properties)
-    if df.empty:
-        print(f"⚠️ Skipping {lectin}: NO binding data.")
-        continue
-    metrics[lectin] = df
+# Analyze binding correlations
+correlation_results = analyze_binding_correlations(filtered_metrics)
+correlation_results.to_excel('results/stats/lectin_binding_correlation_analysis_sum_max.xlsx', index=False)
+
+# Collect correlation statistics with the same aggregation methods
+collect_correlation_statistics(filtered_metrics, within=np.nansum, btw=np.nanmax)
