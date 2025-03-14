@@ -307,8 +307,8 @@ lectins = {k:v for k,v in lectin_binding_motif.items() if any(len(t)>1 for t in 
 binding_data = glycan_binding.set_index('protein').drop(['target'], axis=1).T
 glycan_dict = {g:v for g,v in structure_graphs.items() if g in binding_data.index or any(compare_glycans(g, b) for b in binding_data.index)}
 
-agg1= np.nansum
-agg2= np.nanmax
+agg1= np.nanmean
+agg2= np.nansum
 
 def get_correlations(lectins, glycan_dict, binding_data, agg1, agg2):
   sasa_df, flex_df = pd.DataFrame(index=glycan_dict.keys()), pd.DataFrame(index=glycan_dict.keys())
@@ -335,14 +335,26 @@ def get_correlations(lectins, glycan_dict, binding_data, agg1, agg2):
     sasa_df[lectin] = all_sasa
     flex_df[lectin] = all_flex
 
-  sasa_corr = sasa_df.corrwith(binding_data)
-  flex_corr = flex_df.corrwith(binding_data)
+    # Calculate correlations and process them
+    sasa_corr = sasa_df.corrwith(binding_data)
+    flex_corr = flex_df.corrwith(binding_data)
 
-  sasa_corr.name = f'SASA_corr_{agg1.__name__}_{agg2.__name__}'
-  flex_corr.name = f'Flex_corr_{agg1.__name__}_{agg2.__name__}'
+    # Get absolute sums (a single metric for overall correlation strength)
+    sasa_abs_sum = sasa_corr.abs().sum()
+    flex_abs_sum = flex_corr.abs().sum()
 
-  sasa_corr.to_excel(f'results/stats/sasa_{agg1.__name__}_{agg2.__name__}.xlsx', index=True, header="SASA_corr")
-  flex_corr.to_excel(f'results/stats/flex_{agg1.__name__}_{agg2.__name__}.xlsx', index=True, header="Flex_corr")
+    # Name and save the results
+    sasa_corr.name = "SASA_corr"
+    flex_corr.name = "FLEX_corr"
+    sasa_corr.to_excel(f'results/stats/sasa_{agg1.__name__}_{agg2.__name__}.xlsx', index=True)
+    flex_corr.to_excel(f'results/stats/flex_{agg1.__name__}_{agg2.__name__}.xlsx', index=True)
+
+    # Create a simple summary dataframe
+    summary = pd.DataFrame({
+        'metric': ['SASA', 'Flexibility'],
+        'abs_corr_sum': [sasa_abs_sum, flex_abs_sum]
+    })
+    summary.to_excel(f'results/stats/summary_{agg1.__name__}_{agg2.__name__}.xlsx', index=False)
 
   return sasa_corr, flex_corr
 
