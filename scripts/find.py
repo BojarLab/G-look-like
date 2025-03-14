@@ -1,9 +1,9 @@
 import pandas as pd
 from glycowork.motif.graph import compare_glycans, subgraph_isomorphism
+from glycowork.motif.graph import glycan_to_nxGraph
 from collections import defaultdict
 import logging
 import numpy as np
-from glycowork.motif.graph import glycan_to_nxGraph
 import networkx as nx
 logger = logging.getLogger(__name__)
 
