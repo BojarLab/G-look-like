@@ -330,6 +330,7 @@ sasa_corr, flex_corr = get_correlations(lectins, glycan_dict,
 
 
 
+
 def compare_aggregations(lectins, glycan_dict, binding_data):
     """
     Compares different combinations of aggregation functions for analyzing SASA and flexibility
