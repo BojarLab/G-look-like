@@ -1,5 +1,5 @@
-from scripts.process_lectins import process_lectin_motifs
-from scripts.analyse_agg import analyze_binding_correlations, collect_correlation_statistics
+from scripts_dep.process_lectins import process_lectin_motifs
+from scripts_dep.analyse_agg import analyze_binding_correlations, collect_correlation_statistics
 import logging
 import re
 import pandas as pd

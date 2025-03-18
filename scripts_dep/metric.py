@@ -1,7 +1,7 @@
-from scripts.load_data import load_data
-from scripts.filter_bind_df import filter_bind_df
-from scripts.get_glycan_scores import get_glycan_scores
-from scripts.find import find_matching_glycan, magic
+from scripts_dep.load_data import load_data
+from scripts_dep.filter_bind_df import filter_bind_df
+from scripts_dep.get_glycan_scores import get_glycan_scores
+from scripts_dep.find import find_matching_glycan, magic
 from glycowork.motif.processing import get_class
 import numpy as np
 from typing import Dict, List, Union, Any

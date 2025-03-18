@@ -1,4 +1,4 @@
-from scripts.metric import metric_df
+from scripts_dep.metric import metric_df
 import re
 import numpy as np
 

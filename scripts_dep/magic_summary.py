@@ -3,7 +3,8 @@ from glycowork.motif.graph import compare_glycans, subgraph_isomorphism
 from glycowork.motif.graph import glycan_to_nxGraph
 import numpy as np
 import pandas as pd
-from scripts.load_data import load_data
+from scripts_dep.load_data import load_data
+
 
 
 lectin_binding_motif = {
@@ -84,7 +85,7 @@ lectin_binding_motif = {
         "termini_list": [["f", "f","f","f", "f", "f", "f", "f"]]
     },
     "ACA": {
-        "motif": ["Gal(b1-3)GalNAc", "GalOS(b1-3)GalNAc"], #OS??
+        "motif": ["Gal(b1-3)GalNAc", "GalOS(b1-3)GalNAc"],
         "termini_list": [["f", "f"], ["f", "f"]]
     },
 
@@ -92,118 +93,118 @@ lectin_binding_motif = {
 
 
     "AIA": {
-        "motif": ["Gal(b1-3)GalNAc", "GlcNAC(b1-3)GalNAc"],
-        "termini_list": [["f"], ["f"]]
+        "motif": ["Gal(b1-3)GalNAc", "GlcNAc(b1-3)GalNAc"],
+        "termini_list": [["f", "f"], ["f", "f"]]
     },
     "CF": {
-        "motif": ["GalNAc", "GalNAc",  "GlcNAc", "GlcNAc"], #repeat is not needed
-        "termini_list": [["t", "f", "t", "f"]]
+        "motif": ["GalNAc(a1-?)", "GlcNAc(a1-?)"],
+        "termini_list": [["f"], ["f"]]
     },
     "HAA": {
-        "motif": ["GalNAc", "GlcNAc"], # linkage is missing
-        "termini_list": [["t", "t"]]
+        "motif": ["GalNAc(a1-?)", "GlcNAc(a1-?)"],
+        "termini_list": [["t"], ["t"]]
     },
     "MPA": {
         "motif": ["Gal(b1-3)GlcNAc", "GlcNAc(b1-3)GalNAc"],
-        "termini_list": [["f", "f"], ["t", "t"]]
+        "termini_list": [["f", "f"], ["f", "f"]]
     },
     "LAA": {
-        "motif": ["Fuc(a1-2)Gal(b1-4)GlcNAc"], #why only fuc is terminal and the  ain brach is flexible?
-        "termini_list": [["t", "t", "t"]] #t,f,f
+        "motif": ["Fuc(a1-2)Gal(b1-4)GlcNAc"],
+        "termini_list": [["t", "f", "f"]]
     },
     "LcH": {
-        "motif": ["Man(a1-6)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc", "Man(a1-2)Man"],
-        "termini_list": [["f", "f", "f", "f", "t", "f"], ["t", "t"]]
+        "motif": ["Fuc(a1-6)", "Man(a1-2)"],
+        "termini_list": [["t"], ["t"]]
     },
     "LTL": {
-        "motif": ["Gal(b1-4)[Fuc(a1-3)]GlcNAc", "Fuc(a1-2)Gal(b1-4)[Fuc(a1-3)]GlcNAc]"], #can we put fuc or gal in branch?
-        "termini_list": [["t", "t", "t"], ["t", "t", "t", "t"]]
+        "motif": ["Fuc(a1-3)[Gal(b1-4)]GlcNAc",],
+        "termini_list": [["t", "f", "f"]]
     },
     "LTA": {
-        "motif": ["Gal(b1-4)[Fuc(a1-3)]GlcNAc", "Fuc(a1-2)Gal(b1-4)[Fuc(a1-3)]GlcNAc]"],
-        "termini_list": [["t", "t", "t"], ["t", "t", "t", "t"]]
+        "motif": ["Fuc(a1-3)[Gal(b1-4)]GlcNAc",],
+        "termini_list": [["t", "f", "f"]]
     },
     "PSA": {
-        "motif": ["Man(a1-3)[Man(a1-6)]Man(b1-4)GlcNAc(b1-4)[Fuc(a1-6)]GlcNAc"],
-        "termini_list": [["f", "f", "f", "f", "t","f"]]
+        "motif": ["Fuc(a1-6)"],
+        "termini_list": [["t"]]
     },
 
 
 
     "PTL-I": {
-        "motif": ["GalNAc(a1-3)Gal(a1-2)Fuc", "Gal(a1-3)Gal(a1-2)Fuc"], #why not just one main branch?
-        "termini_list": [["t", "t", "t"], ["t", "t", "t"]]
+        "motif": ["Fuc(a1-2)[GalNAc(a1-3)]Gal", "Fuc(a1-2)[Gal(a1-3)]Gal"],
+        "termini_list": [["t", "t", "f"], ["t", "t", "f"]]
     },
     "PTA-I": {
-        "motif": ["GalNAc(a1-3)Gal(a1-2)Fuc", "Gal(a1-3)Gal(a1-2)Fuc"],
-        "termini_list": [["t", "t", "t"], ["t", "t", "t"]]
+        "motif": ["Fuc(a1-2)[GalNAc(a1-3)]Gal", "Fuc(a1-2)[Gal(a1-3)]Gal"],
+        "termini_list": [["t", "t", "f"], ["t", "t", "f"]]
     },
 
 
     "PTA-II": {
-        "motif": ["Fuc(a1-2)Gal(b1-4)GlcNAc" ], #basically only Fuc is temrinal
-        "termini_list": [["t", "t", "t"] ] #PTA has only one binding motif so why flexible?
+        "motif": ["Fuc(a1-2)Gal(b1-4)GlcNAc" ],
+        "termini_list": [["t", "f", "f"] ]
     },
     "PTL-II": {
         "motif": ["Fuc(a1-2)Gal(b1-4)GlcNAc" ],
-        "termini_list": [["t", "t", "t"] ] #same here why flexible?
+        "termini_list": [["t", "f", "f"] ]
     },
 
 
     "TJA-II": {
         "motif": ["Fuc(a1-2)Gal(b1-3)GalNAc", "Fuc(a1-2)Gal(b1-3/4)GlcNAc"],
-        "termini_list": [["t", "t", "t"], ["t", "t", "t"]]
+        "termini_list": [["t", "f", "f"], ["t", "f", "f"]]
     },
     "UEA-I": {
-        "motif": ["Fuc(a1-2)Gal(b1-4)GlcNAc", "Fuc(a1-2)Gal(b1-4)Glc","Fuc(a1-2)Gal(b1-4)[Fuc(a1-3)]GlcNAc" ],
-        "termini_list": [["t", "t", "t"],["t", "t", "t"],["t", "t", "t"]]
+        "motif": ["Fuc(a1-2)Gal(b1-4)"],
+        "termini_list": [["t", "f"]]
     },
     "CTB": {
         "motif": ["Gal(b1-3)GalNAc(b1-4)[Sia(a2-3)]Gal(b1-4)GlcNAc(b1-3)", "Fuc(a1-2)Gal(b1-3)GalNAc(b1-4)[Sia(a2-3)]Gal(b1-4)GlcNAc(b1-3)"],
-        "termini_list": [["t", "t", "t", "t", "t"], ["t", "t", "t", "t", "t", "t"]]
+        "termini_list": [["t", "f", "t", "f", "f"], ["t", "f", "f", "t", "f", "f"]]
 
     },
 
     "MAL-I": {
-        "motif": ["3SGal(b1-4)GlcNAc", "Sia(a2-3)Gal(b1-4)GlcNAc"], #3S, +-6S
-        "termini_list": [["t", "t"], ["t", "t", "t"]]
+        "motif": ["Gal3S(b1-4)GlcNAc", "Gal3S(b1-4)GlcNAc6S", "Sia(a2-3)Gal(b1-4)GlcNAc"],
+        "termini_list": [["t", "f"], ["t", "f"], ["t", "f", "f"]]
     },
     "MAA": {
-        "motif": ["3SGal(b1-4)GlcNAc", "Sia(a2-3)Gal(b1-4)GlcNAc"],  # 3S, +-6S
-        "termini_list": [["t", "t"], ["t", "t", "t"]]
+        "motif": ["Gal3S(b1-4)GlcNAc", "Gal3S(b1-4)GlcNAc6S", "Sia(a2-3)Gal(b1-4)GlcNAc"],
+        "termini_list": [["t", "f"], ["t", "f"], ["t", "f", "f"]]
     },
     "MAL": {
-        "motif": ["3SGal(b1-4)GlcNAc", "Sia(a2-3)Gal(b1-4)GlcNAc"],  # 3S, +-6S
-        "termini_list": [["t", "t"], ["t", "t", "t"]]
+        "motif": ["Gal3S(b1-4)GlcNAc", "Gal3S(b1-4)GlcNAc6S", "Sia(a2-3)Gal(b1-4)GlcNAc"],
+        "termini_list": [["t", "f"], ["t", "f"], ["t", "f", "f"]]
     },
 
 
     "PSL": {
         "motif": ["Sia(a2-6)Gal(b1-3/4)GlcNAc"],
-        "termini_list": [["t", "t", "t"]]
+        "termini_list": [["t", "f", "f"]]
     },
     "TJA-I": {
         "motif": ["Sia(a2-6)Gal(b1-4)GlcNAc"],
-        "termini_list": [["t", "t", "t"]]
+        "termini_list": [["t", "f", "f"]]
     },
 
 
 
     "GS-II": {
-        "motif": ["GlcNAc(b1-?)", "GlcNAc(a1-?)"],
-        "termini_list": [["t"], ["t"]]
+        "motif": ["GlcNAc"],
+        "termini_list": [["t"]]
     },
     "PWA": {
-        "motif": ["GlcNAc(b1-4)GlcNAc(b1-4)GlcNAc(b1-4)GlcNAc(b1-4)"],
-        "termini_list": [["t", "t", "t", "t"]]
+        "motif": ["GlcNAc(b1-4)GlcNAc(b1-4)GlcNAc(b1-4)GlcNAc"],
+        "termini_list": [["t", "f", "f", "f"]]
     },
     "UEA-II": {
-        "motif": ["GlcNAc(b1-3)Gal", "GlcNAc(b1-3)GalNAc", "Fuc(a1-2)Gal(b1-4)GlCNAc", "Fuc(a1-2)Gal(b1-3)GalNAc(b1-3)" ],
-        "termini_list": [["t", "t"], ["t", "t"], ["t", "t", "t"], ["t", "t", "t"]]
+        "motif": ["GlcNAc(b1-3)", "Fuc(a1-2)Gal(b1-4)GlcNAc", "Fuc(a1-2)Gal(b1-3)GalNAc" ],
+        "termini_list": [["t"], ["t", "f", "f"], ["t", "f", "f"]]
     },
     "WGA": {
-        "motif": ["GlcNAc(b1-?)", "GlcNAc(a1-?)", "GalNAc(a/b1-?)", "Sia(a2-?)", "MurNAc(b1-?)"], #b1? or b2?
-        "termini_list": [["t"], ["t"], ["t"], ["t"], ["t"]]
+        "motif": ["GlcNAc", "GalNAc", "Sia(a2-?)", "MurNAc(b1-?)"],
+        "termini_list": [["t"], ["t"], ["t"], ["t"]]
     },
 
 
@@ -221,7 +222,7 @@ lectin_binding_motif = {
 
     "ECA": {
         "motif": ["Gal(b1-4)GlcNAc", "GalNAc(b1-4)GlcNAc"],
-        "termini_list": [["t", "t"], ["t", "t"]]
+        "termini_list": [["t", "f"], ["t", "f"]]
     },
     "GS-I": {
         "motif": ["Gal(a1-?)", "GalNAc(a1-?)"],
@@ -229,17 +230,17 @@ lectin_binding_motif = {
     },
 
     "LEA": {
-        "motif": ["Gal(b1-4)GlcNAc(b1-3)", "GlcNAc(b1-4)", "GalNAc(b1-4)GlcNAc"],
-        "termini_list": [["t", "t"], ["t"], ["t", "t"]]
+        "motif": ["Gal(b1-4)GlcNAc(b1-3)", "GlcNAc(b1-4)GlcNAc", "GalNAc(b1-4)GlcNAc"],
+        "termini_list": [["t", "f"], ["t", "f"], ["t", "f"]]
     },
     "LEL": {
-        "motif": ["Gal(b1-4)GlcNAc(b1-3)", "GlcNAc(b1-4)", "GalNAc(b1-4)GlcNAc"],
-        "termini_list": [["t", "t"], ["t"], ["t", "t"]]
+        "motif": ["Gal(b1-4)GlcNAc(b1-3)", "GlcNAc(b1-4)GlcNAc", "GalNAc(b1-4)GlcNAc"],
+        "termini_list": [["t", "f"], ["t", "f"], ["t", "f"]]
     },
 
     "MOA": {
-        "motif": ["Gal(a1-3)Gal", "Gal(a1-3)GalNAc"], #Fuc is trimmed
-        "termini_list": [["t", "t"], ["t", "f"]] #t,f or t,t,?
+        "motif": ["Gal(a1-3)Gal", "Gal(a1-3)GalNAc"],
+        "termini_list": [["t", "f"], ["t", "f"]]
     },
     "PA-IL": {
         "motif": ["Gal(a1-?)"],
@@ -259,61 +260,54 @@ lectin_binding_motif = {
     },
 
     "SJA": {
-        "motif": ["Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-3)", "Gal(a1-3)[Fuc(a1-2)]Gal", "GalNAc(b1-4)GlcNAc"],
-        "termini_list": [["t", "t", "t", "t"], ["t", "t", "t"], ["t", "t"]]
+        "motif": ["Gal(b1-4)GlcNAc(b1-3)Gal(b1-4)GlcNAc(b1-3)", "Fuc(a1-2)[Gal(a1-3)]Gal", "GalNAc(b1-4)GlcNAc"],
+        "termini_list": [["t", "f", "f", "f"], ["t", "t", "f"], ["t", "f"]]
     },
 
     "STA": {
-        "motif": ["Gal(b1-4)GlcNAc(b1-3)", "GlcNAc(b1-4)", "GalNAc(b1-4)GlcNAc"],
-        "termini_list": [["t", "t"], ["t"], ["t", "t"]]
+        "motif": ["Gal(b1-4)GlcNAc(b1-3)", "GlcNAc(b1-4)GlcNAc", "GalNAc(b1-4)GlcNAc"],
+        "termini_list": [["t", "f"], ["t", "f"], ["t", "f"]]
     },
     "STL": {
-        "motif": ["Gal(b1-4)GlcNAc(b1-3)", "GlcNAc(b1-4)", "GalNAc(b1-4)GlcNAc"],
-        "termini_list": [["t", "t"], ["t"], ["t", "t"]]
+        "motif": ["Gal(b1-4)GlcNAc(b1-3)", "GlcNAc(b1-4)GlcNAc", "GalNAc(b1-4)GlcNAc"],
+        "termini_list": [["t", "f"], ["t", "f"], ["t", "f"]]
     },
 
     "CSA": {
-        "motif": ["GalNAc(b1-?)", "GalNAc(a1-?)"],
-        "termini_list": [["t"], ["t"]]
+        "motif": ["GalNAc"],
+        "termini_list": [["t"]]
     },
     "DBA": {
         "motif": ["GalNAc(a1-3)GalNAc(b1-?)"],
-        "termini_list": [["t", "t"]]
+        "termini_list": [["t", "f"]]
     },
     "SBA": {
-        "motif": ["GalNAc(b1-?)", "GalNAc(a1-3)GalNAc(b1-?)", "GalNAc(a1-?"],
-        "termini_list": [["t"], ["t", "t"], ["t"]]
+        "motif": ["GalNAc", "GalNAc(a1-3)GalNAc(b1-?)"],
+        "termini_list": [["t"], ["t", "f"]]
     },
 
 
     "VVL": {
-        "motif": ["GalNAc(b1-3/4)GlcNAc", "GalNAc(b1-?)", "GalNAc(a1-?)"],
-        "termini_list": [["t", "f"], ["t"], ["t"]]
+        "motif": ["GalNAc"],
+        "termini_list": [["t"]]
     },
     "VVA": {
-        "motif": ["GalNAc(b1-3/4)GlcNAc", "GalNAc(b1-?)", "GalNAc(a1-?)"],
-        "termini_list": [["t", "f"], ["t"], ["t"]]
+        "motif": ["GalNAc"],
+        "termini_list": [["t"]]
     },
 
 
     "WFA": {
-        "motif": ["GalNAc(b1-?)", "GalNAc(a1-?)", "GalNAc(b1-3/4)GlcNAc(b1-3)"],
-        "termini_list": [["t"], ["t"], ["t", "t"]]
+        "motif": ["GalNAc", "Gal(b1-3/4)GlcNAc(b1-3)"],
+        "termini_list": [["t"], ["t", "f"]]
     }
 }
 structure_graphs, glycan_binding, invalid_graphs = load_data()
-
-#lectins = {k:v for k,v in lectin_binding_motif.items() if any(len(t)>1 for t in v['termini_list']) and k in glycan_binding.protein.tolist()}
+lectins_filt = {k:v for k,v in lectin_binding_motif.items() if any(len(t)>1 for t in v['termini_list']) and k in glycan_binding.protein.tolist()} # compare_aggregations
 lectins = {k:v for k,v in lectin_binding_motif.items() if k in glycan_binding.protein.tolist()}
-
-
 binding_data = glycan_binding.set_index('protein').drop(['target'], axis=1).T
-#glycan_dict = {g:v for g,v in structure_graphs.items() if g in binding_data.index or any(compare_glycans(g, b) for b in binding_data.index)}
-glycan_dict = {g:v for g,v in structure_graphs.items() if g in binding_data.index and any(compare_glycans(g, b) for b in binding_data.index)}
+glycan_dict = {g:v for g,v in structure_graphs.items() if g in binding_data.index or any(compare_glycans(g, b) for b in binding_data.index)}
 
-
-agg1= np.nansum
-agg2= np.nanmean
 
 def get_correlations(lectins, glycan_dict, binding_data, agg1=np.nansum, agg2=np.mean):
   sasa_df, flex_df = pd.DataFrame(index=glycan_dict.keys()), pd.DataFrame(index=glycan_dict.keys())
@@ -326,66 +320,14 @@ def get_correlations(lectins, glycan_dict, binding_data, agg1=np.nansum, agg2=np
       all_flex.append(agg2([agg1([ggraph.nodes()[n].get('flexibility', np.nan) for n in m]) for m in unwrap(matches[0])]))
     sasa_df[lectin] = all_sasa
     flex_df[lectin] = all_flex
-  sasa_corr = sasa_df.corrwith(binding_data)
+  sasa_corr = sasa_df.corrwith(binding_data, axis=0, drop=False, method='pearson')
   flex_corr = flex_df.corrwith(binding_data)
   return sasa_corr, flex_corr
 
-sasa_corr, flex_corr = get_correlations(lectins, glycan_dict, binding_data.loc[list(glycan_dict.keys()), list(lectins.keys())])
+sasa_corr, flex_corr = get_correlations(lectins, glycan_dict,
+                                        binding_data.loc[list(glycan_dict.keys()), list(lectins.keys())])
 
 
-
-
-
-
-
-def get_correlations_(lectins, glycan_dict, binding_data, agg1, agg2):
-  sasa_df, flex_df = pd.DataFrame(index=glycan_dict.keys()), pd.DataFrame(index=glycan_dict.keys())
-  for lectin, binding_motif in lectins.items():
-    motif_graphs = [glycan_to_nxGraph(binding_motif['motif'][i], termini='provided', termini_list=binding_motif['termini_list'][i]) for i in range(len(binding_motif['motif']))]
-    all_sasa, all_flex = [], []
-    for _, ggraph in glycan_dict.items():
-      _, matches = zip(*[subgraph_isomorphism(ggraph, motif_graph, return_matches=True) for motif_graph in motif_graphs])
-
-      unwrapped_matches = unwrap(matches[0])
-
-      if not unwrapped_matches:
-          all_sasa.append(np.nan)  # No matches found, use NaN
-          all_flex.append(np.nan)
-      else:
-          sasa_values = [agg1([ggraph.nodes[n].get('SASA', np.nan) for n in m])
-                         for m in unwrapped_matches]
-          flex_values = [agg1([ggraph.nodes[n].get('flexibility', np.nan) for n in m])
-                         for m in unwrapped_matches]
-
-          all_sasa.append(agg2(sasa_values) if sasa_values else np.nan)
-          all_flex.append(agg2(flex_values) if flex_values else np.nan)
-
-    sasa_df[lectin] = all_sasa
-    flex_df[lectin] = all_flex
-
-    # Calculate correlations and process them
-    sasa_corr = sasa_df.corrwith(binding_data, axis=0, drop=False, method='pearson') #default
-    flex_corr = flex_df.corrwith(binding_data, axis=0, drop=False, method='pearson')
-
-    # Get absolute sums (a single metric for overall correlation strength)
-    sasa_abs_medain = sasa_corr.abs().median()
-    flex_abs_medain = flex_corr.abs().median()
-
-    # Name and save the results
-    sasa_corr.name = "SASA_corr"
-    flex_corr.name = "FLEX_corr"
-    sasa_corr.to_csv(f'results/stats/sasa_{agg1.__name__}_{agg2.__name__}.csv', header=True)
-    flex_corr.to_csv(f'results/stats/flex_{agg1.__name__}_{agg2.__name__}.csv', header=True)
-
-    # Create a simple summary dataframe
-    summary = pd.DataFrame({
-        'metric': ['SASA', 'Flexibility'],
-        'abs_corr_sum': [sasa_abs_medain, flex_abs_medain]
-    })
-    summary.to_csv(f'results/stats/summary_{agg1.__name__}_{agg2.__name__}.csv', header=True)
-
-  return sasa_corr, flex_corr
-#sasa, flex = get_correlations(lectins, glycan_dict, binding_data.loc[list(glycan_dict.keys()), list(lectins.keys())], agg1, agg2)
 
 def compare_aggregations(lectins, glycan_dict, binding_data):
     """
@@ -440,8 +382,8 @@ def compare_aggregations(lectins, glycan_dict, binding_data):
         flex_results[combo_name] = flex_corr
 
         # Calculate only the median of absolute correlations
-        sasa_abs_median = sasa_corr.abs().sum()
-        flex_abs_median = flex_corr.abs().sum()
+        sasa_abs_median = sasa_corr.abs().median()
+        flex_abs_median = flex_corr.abs().median()
 
         # Store only the median statistics
         summary_rows.append({
@@ -471,4 +413,4 @@ def compare_aggregations(lectins, glycan_dict, binding_data):
     print(sorted_summary[['agg_combo', 'sasa_abs_median', 'flex_abs_median', 'combined_abs_median']])
 
     return sasa_comparison, flex_comparison, summary_df
-#sasa_comparison, flex_comparison, summary_df  = compare_aggregations(lectins, glycan_dict, binding_data.loc[list(glycan_dict.keys()), list(lectins.keys())])
+#sasa_comparison, flex_comparison, summary_df  = compare_aggregations(lectins_filt, glycan_dict, binding_data.loc[list(glycan_dict.keys()), list(lectins_filt.keys())])
