@@ -442,8 +442,6 @@ def get_correlations_(lectins, glycan_dict, binding_data, agg1, agg2):
     flex_corr = flex_corr.reset_index().groupby("index").median()
     return sasa_corr, flex_corr
 
-
-
 """
 Lectin-Binding Motif > 1 mono
 agg1 = variable
