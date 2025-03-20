@@ -362,7 +362,8 @@ lectins = {k: v for k, v in lectin_binding_motif.items() if k in glycan_binding.
 binding_data = glycan_binding.set_index('protein').drop(['target'], axis=1).T #subset of glycan_binding
 
 binding_data = binding_data.rename(columns=lectin_keys)  # synonym dict
-binding_data = binding_data.T.groupby(level=0).median().T  # aggregate multiple columns for same lectin
+binding_data = binding_data.T.groupby(level=0).median().T
+
 
 glycan_dict = {g: v for g, v in structure_graphs.items() if
                g in binding_data.index or any(compare_glycans(g, b) for b in binding_data.index)}
@@ -514,8 +515,8 @@ agg_n = ['nansum', 'nanmax', 'nanmean']
 sasa_filt = {}
 flex_filt = {}
 x = list(glycan_dict.keys())
-#y = list(set(list(lectin_keys.values()))) # set to remove duplicates
-#found_lectins = [lectin for lectin in y if lectin in binding_data.columns]
+y = list(set(list(lectin_keys.values()))) # set to remove duplicates
+found_lectins = [lectin for lectin in y if lectin in binding_data.columns]
 
 
 for i, name in zip(agg_list, agg_n):
@@ -523,6 +524,7 @@ for i, name in zip(agg_list, agg_n):
         lectins_filt.keys(), #subest of lectins
         glycan_dict,
         binding_data.loc[x, binding_data.columns],
+        #binding_data.loc[x, found_lectins],
         agg1=i,
         agg2=np.nansum)
 
@@ -554,7 +556,8 @@ for i, name in zip(agg_list, agg_n):
     sasa_corr, flex_corr = get_correlations_(
         lectins,
         glycan_dict,
-        binding_data.loc[list(glycan_dict.keys()), binding_data.columns],
+        #binding_data.loc[list(glycan_dict.keys()), binding_data.columns],
+        binding_data.loc[x, found_lectins],
         agg1=np.nansum,
         agg2=i)
 
