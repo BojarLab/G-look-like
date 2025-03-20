@@ -1,6 +1,4 @@
 from inspect import unwrap
-
-from IPython.lib.deepreload import found_now
 from glycowork.motif.graph import compare_glycans, subgraph_isomorphism
 from glycowork.motif.graph import glycan_to_nxGraph
 from scripts_dep.load_data import load_data
@@ -518,8 +516,6 @@ flex_filt = {}
 x = list(glycan_dict.keys())
 #y = list(set(list(lectin_keys.values()))) # set to remove duplicates
 #found_lectins = [lectin for lectin in y if lectin in binding_data.columns]
-
-
 
 
 for i, name in zip(agg_list, agg_n):
