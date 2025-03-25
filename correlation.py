@@ -1,10 +1,14 @@
 from inspect import unwrap
 from glycowork.motif.graph import compare_glycans, subgraph_isomorphism
 from glycowork.motif.graph import glycan_to_nxGraph
-from scripts_dep.load_data import load_data
-import matplotlib.pyplot as plt
+from scripts.load_data import load_data
 import pandas as pd
-import numpy as np
+import scipy.stats as stats
+import itertools
+
+import warnings
+warnings.filterwarnings("ignore")
+
 
 lectin_binding_motif = {
     "AOL": {"motif": ["Fuc(a1-?)"],
@@ -122,11 +126,16 @@ lectin_binding_motif = {
 
     "PTL-I": {
         "motif": ["Fuc(a1-2)[GalNAc(a1-3)]Gal", "Fuc(a1-2)[Gal(a1-3)]Gal"],
-        "termini_list": [["t", "t", "f"], ["t", "t", "f"]]
+        "termini_list": [["t", "t", "f"], ["t", "t", "f"]] #double t?
+        #"termini_list": [["t", "f", "f"], ["t", "f", "f"]]  # double t?
+
     },
+
     "PTA-I": {
         "motif": ["Fuc(a1-2)[GalNAc(a1-3)]Gal", "Fuc(a1-2)[Gal(a1-3)]Gal"],
         "termini_list": [["t", "t", "f"], ["t", "t", "f"]]
+      #  "termini_list": [["t", "f", "f"], ["t", "f", "f"]]  # double t?
+
     },
 
     "PTA-II": {
@@ -146,6 +155,7 @@ lectin_binding_motif = {
         "motif": ["Fuc(a1-2)Gal(b1-4)"],
         "termini_list": [["t", "f"]]
     },
+
     "CTB": {
         "motif": ["Gal(b1-3)GalNAc(b1-4)[Sia(a2-3)]Gal(b1-4)GlcNAc(b1-3)",
                   "Fuc(a1-2)Gal(b1-3)GalNAc(b1-4)[Sia(a2-3)]Gal(b1-4)GlcNAc(b1-3)"],
@@ -155,14 +165,18 @@ lectin_binding_motif = {
 
     "MAL-I": {
         "motif": ["Gal3S(b1-4)GlcNAc", "Gal3S(b1-4)GlcNAc6S", "Sia(a2-3)Gal(b1-4)GlcNAc"],
+        #"motif": ["Gal(b1-4)GlcNAc", "Gal(b1-4)GlcNAc6S", "Neu5Ac(a2-3)Gal(b1-4)GlcNAc"],
         "termini_list": [["t", "f"], ["t", "f"], ["t", "f", "f"]]
     },
+
     "MAA": {
-        "motif": ["Gal3S(b1-4)GlcNAc", "Gal3S(b1-4)GlcNAc6S", "Sia(a2-3)Gal(b1-4)GlcNAc"],
+        #"motif": ["Gal3S(b1-4)GlcNAc", "Gal3S(b1-4)GlcNAc6S", "Sia(a2-3)Gal(b1-4)GlcNAc"],
+        "motif": ["Gal(b1-4)GlcNAc", "Gal(b1-4)GlcNAc6S", "Neu5Ac(a2-3)Gal(b1-4)GlcNAc"],
         "termini_list": [["t", "f"], ["t", "f"], ["t", "f", "f"]]
     },
     "MAL": {
-        "motif": ["Gal3S(b1-4)GlcNAc", "Gal3S(b1-4)GlcNAc6S", "Sia(a2-3)Gal(b1-4)GlcNAc"],
+        "motif": ["Gal(b1-4)GlcNAc", "Gal(b1-4)GlcNAc6S", "Neu5Ac(a2-3)Gal(b1-4)GlcNAc"],
+        #"motif": ["Gal3S(b1-4)GlcNAc", "Gal3S(b1-4)GlcNAc6S", "Sia(a2-3)Gal(b1-4)GlcNAc"],
         "termini_list": [["t", "f"], ["t", "f"], ["t", "f", "f"]]
     },
 
@@ -282,18 +296,17 @@ lectin_binding_motif = {
     }
 }
 lectin_keys= {
-    "LTL": "LTA",
-    "PTL-I": "PTA-I",
-    "MAL": "MAA",
-    "BPL": "BPA",
-    "LEL": "LEA",
-    "STL": "STA",
-    "VVL": "VVA",
-
-
+    "PTL-I": "PTL-I",
+    "MAL": "MAL-I",
+    "BPL": "BPL",
+    "LEL": "LEL",
+    "STL": "STL",
+    "VVL": "VVL",
     "AOL": "AOL",
+    "AAA": "AAA",
     "AAL": "AAL",
     "SNA": "SNA",
+    "SNA-I": "SNA",
     "ConA": "ConA",
     "MAL-II": "MAL-II",
     "PNA": "PNA",
@@ -301,9 +314,12 @@ lectin_keys= {
     "HPA": "HPA",
     "AMA": "AMA",
     "GNA": "GNA",
+    "GNL": "GNA",
     "HHL": "HHL",
     "MNA-M": "MNA-M",
+    "Morniga": "MNA-M",
     "NPA": "NPA",
+    "NPL": "NPA",
     "UDA": "UDA",
     "ABA": "ABA",
     "CA": "CA",
@@ -311,53 +327,59 @@ lectin_keys= {
     "TL": "TL",
     "ACA": "ACA",
     "AIA": "AIA",
+    "Jacalin": "AIA",
     "CF": "CF",
     "HAA": "HAA",
     "MPA": "MPA",
     "LAA": "LAA",
     "LcH": "LcH",
-    "LTA": "LTA",
+    "LCA": "LcH",
+    "LTA": "LTL",
+    "LTL": "LTL",
     "PSA": "PSA",
-    "PTA-I": "PTA-I",
-    "PTA-II": "PTA-II",
+    "PTA-I": "PTL-I",
+    "PTA-II": "PTL-II",
     "PTL-II": "PTL-II",
     "TJA-II": "TJA-II",
     "UEA-I": "UEA-I",
     "CTB": "CTB",
     "MAL-I": "MAL-I",
-    "MAA": "MAA",
+    "MAA": "MAL-I",
     "PSL": "PSL",
     "TJA-I": "TJA-I",
     "GS-II": "GS-II",
     "PWA": "PWA",
     "UEA-II": "UEA-II",
     "WGA": "WGA",
-    "BPA": "BPA",
-    "ECA": "ECA",
+    "BPA": "BPL",
+    "ECA": "ECL",
     "GS-I": "GS-I",
-    "LEA": "LEA",
+    "GSL-I": "GS-I",
+    "LEA": "LEL",
     "MOA": "MOA",
     "PA-IL": "PA-IL",
-    "LecA": "LecA",
+    "LecA": "PA-IL",
     "RCA-I": "RCA-I",
-    "RCA120": "RCA120",
+    "RCA120": "RCA-I",
     "SJA": "SJA",
-    "STA": "STA",
+    "STA": "STL",
     "CSA": "CSA",
     "DBA": "DBA",
     "SBA": "SBA",
-    "VVA": "VVA",
-    "WFA": "WFA"
+    "VVA": "VVL",
+    "WFA": "WFL",
+    "WFL": "WFL"
 }
-
-
 
 structure_graphs, glycan_binding, invalid_graphs = load_data()
 
-lectins_filt = {k: v for k, v in lectin_binding_motif.items() if any(
-    len(t) > 1 for t in v['termini_list']) and k in glycan_binding.protein.tolist()}  # compare_aggregations
+lectins_filt = {k: v for k, v in lectin_binding_motif.items()
+                if any(
+    len(t) > 1 for t in v['termini_list'])
+                and k in glycan_binding.protein.tolist()}  # compare_aggregations
 
 lectins = {k: v for k, v in lectin_binding_motif.items() if k in glycan_binding.protein.tolist()}
+
 
 binding_data = glycan_binding.set_index('protein').drop(['target'], axis=1).T #subset of glycan_binding
 
@@ -370,208 +392,194 @@ glycan_dict = {g: v for g, v in structure_graphs.items() if
 
 
 
-def plot_correlation_boxplot(sasa_all, flex_all, title="Correlation Distributions"):
+def get_correlations5(lectins, glycan_dict, binding_data, agg1, agg2):
     """
-    Creates a box plot showing the distributions of correlation values alongside their median values.
+    Calculate correlations between SASA/flexibility values and binding data.
 
     Parameters:
-    -----------
-    sasa_all : dict
-        Dictionary where keys are aggregation method names and values are DataFrames/Series of SASA correlations
-    flex_all : dict
-        Dictionary where keys are aggregation method names and values are DataFrames/Series of flexibility correlations
-    title : str, optional
-        Title for the plot
+    - lectins: List of lectin names to analyze
+    - glycan_dict: Dictionary mapping glycan IDs to graph structures
+    - binding_data: DataFrame with binding data for lectins
+    - agg1: Function for first-level aggregation (node values within a match)
+    - agg2: Function for second-level aggregation (across multiple matches)
 
-    Returns:
-    --------
-    fig, ax : tuple
-        The figure and axes objects for further customization if needed
+    Returns: (sasa_correlation, flexibility_correlation) tuple of DataFrames
     """
-    # Prepare data for plotting
-    plot_data = []
-    labels = []
-    medians = []
-    colors = []
+    # Initialize DataFrames
+    sasa_df = pd.DataFrame(index=glycan_dict.keys())
+    flex_df = pd.DataFrame(index=glycan_dict.keys())
 
-    # Process SASA correlations
-    for name, corr_data in sasa_all.items():
-        # Convert to absolute values and flatten if it's a DataFrame
-        if isinstance(corr_data, pd.DataFrame):
-            values = corr_data.abs().values.flatten()
-        else:
-            values = corr_data.abs().values
-
-        # Remove NaN values
-        values = values[~np.isnan(values)]
-
-        plot_data.append(values)
-        labels.append(f"SASA-{name}")
-        medians.append(np.median(values))
-        colors.append('lightblue')
-
-    # Process flexibility correlations
-    for name, corr_data in flex_all.items():
-        # Convert to absolute values and flatten if it's a DataFrame
-        if isinstance(corr_data, pd.DataFrame):
-            values = corr_data.abs().values.flatten()
-        else:
-            values = corr_data.abs().values
-
-        # Remove NaN values
-        values = values[~np.isnan(values)]
-
-        plot_data.append(values)
-        labels.append(f"Flex-{name}")
-        medians.append(np.median(values))
-        colors.append('lightgreen')
-
-    # Create the figure and axes
-    fig, ax = plt.subplots(figsize=(12, 6))
-
-    # Create box plot
-    bp = ax.boxplot(plot_data, patch_artist=True, showfliers=True, widths=0.6)
-
-    # Customize box plot colors
-    for patch, color in zip(bp['boxes'], colors):
-        patch.set_facecolor(color)
-
-    # Add scatter points for the actual data (jittered)
-    for i, data in enumerate(plot_data):
-        # Add jitter to x position
-        x = np.random.normal(i + 1, 0.08, size=len(data))
-        ax.scatter(x, data, alpha=0.5, s=10, c='darkgray', edgecolor='none')
-
-    # Add markers for the median values
-    for i, median in enumerate(medians):
-        ax.scatter(i + 1, median, s=100, c='red', marker='*',
-                   label='Median' if i == 0 else "", zorder=3)
-
-    # Add a legend for the median marker (only once)
-    ax.legend()
-
-    # Customize the plot
-    ax.set_title(title, fontsize=14)
-    ax.set_ylabel('Absolute Correlation Value', fontsize=12)
-    ax.set_xticks(range(1, len(labels) + 1))
-    ax.set_xticklabels(labels, rotation=45, ha='right')
-
-    # Add a grid for better readability
-    ax.yaxis.grid(True, linestyle='--', alpha=0.7)
-
-    # Tight layout to ensure labels are visible
-    plt.tight_layout()
-
-    return fig, ax
-
-def get_correlations_(lectin_keys, glycan_dict, binding_data, agg1, agg2):
-    sasa_df, flex_df = pd.DataFrame(index=glycan_dict.keys()), pd.DataFrame(index=glycan_dict.keys())
-
-    def safe_agg(func, data):
-        if len(data) == 0:
-            return np.nan  # Return NaN for empty arrays
-        return func(data)
-
-    for lectin in lectin_keys:
+    for lectin in lectins:
+        # Get binding motif for this lectin
         binding_motif = lectin_binding_motif[lectin]
-        motif_graphs = [glycan_to_nxGraph(binding_motif['motif'][i], termini='provided',
-                                          termini_list=binding_motif['termini_list'][i]) for i in
-                        range(len(binding_motif['motif']))]
-        all_sasa, all_flex = [], []
-        for _, ggraph in glycan_dict.items():
-            _, matches = zip(
-                *[subgraph_isomorphism(ggraph, motif_graph, return_matches=True) for motif_graph in motif_graphs])
 
-            # Use safe_agg to handle empty arrays
-            sasa_values = [safe_agg(agg1, [ggraph.nodes()[n].get('SASA', np.nan) for n in m]) for m in
-                           unwrap(matches[0])]
-            all_sasa.append(safe_agg(agg2, sasa_values))
+        # Create graph representations of all motifs
+        motif_graphs = [
+            glycan_to_nxGraph(
+                binding_motif['motif'][i],
+                termini='provided',
+                termini_list=binding_motif['termini_list'][i]
+            ) for i in range(len(binding_motif['motif']))
+        ]
 
-            flex_values = [safe_agg(agg1, [ggraph.nodes()[n].get('flexibility', np.nan) for n in m]) for m in
-                           unwrap(matches[0])]
-            all_flex.append(safe_agg(agg2, flex_values))
+        # Store results for each glycan
+        sasa_values = {}
+        flex_values = {}
 
-        sasa_df[lectin] = all_sasa
-        flex_df[lectin] = all_flex
+        # Process each glycan
+        for glycan_key, glycan_graph in glycan_dict.items():
+            # Collect all matches from all motifs
+            all_matches = []
+            for motif_graph in motif_graphs:
+                _, matches = subgraph_isomorphism(glycan_graph, motif_graph, return_matches=True)
+                all_matches.extend(unwrap(matches))
 
-    sasa_corr = sasa_df.corrwith(binding_data, axis=0, drop=False, method='pearson')
-    sasa_corr = sasa_corr  # .reset_index().groupby("index").median().dropna()  # agg multiple proteins columns in binding data
+            if not all_matches:
+                continue
 
-    flex_corr = flex_df.corrwith(binding_data).dropna()  # drop lectins with no corr
-    flex_corr = flex_corr.reset_index().groupby("index").median()
-    return sasa_corr, flex_corr
+            # Calculate values for each match
+            match_sasa = []
+            match_flex = []
 
+            for match in all_matches:
+                # Apply first aggregation to node values
+                sasa = agg1([glycan_graph.nodes[n].get('SASA', np.nan) for n in match])
+                flex = agg1([glycan_graph.nodes[n].get('flexibility', np.nan) for n in match])
+
+                match_sasa.append(sasa)
+                match_flex.append(flex)
+
+            # Apply second aggregation or use single value
+            if len(match_sasa) > 1:
+                sasa_values[glycan_key] = agg2(match_sasa)
+                flex_values[glycan_key] = agg2(match_flex)
+            else:
+                sasa_values[glycan_key] = match_sasa[0] if match_sasa else np.nan
+                flex_values[glycan_key] = match_flex[0] if match_flex else np.nan
+
+        # Add results to DataFrames
+        sasa_df[lectin] = pd.Series(sasa_values)
+        flex_df[lectin] = pd.Series(flex_values)
+
+    # Calculate correlations and handle duplicate lectins
+    sasa_correlation = sasa_df.corrwith(binding_data, axis=0, drop=False, method='pearson')
+    sasa_correlation = sasa_correlation.reset_index().groupby("index").median()
+
+    flex_correlation = flex_df.corrwith(binding_data)
+    flex_correlation = flex_correlation.reset_index().groupby("index").median()
+
+    return sasa_correlation, flex_correlation
+
+import numpy as np
 
 """
-Lectin-Binding Motif > 1 mono
-agg1 = variable #sum/mean won!
-agg2 = fixed
+Common setup for analyses of filtered and all lectins
+"""
+# Define aggregation functions and their labels
+agg_functions = [np.nansum, np.nanmax, np.nanmean]
+agg_labels = ['nansum', 'nanmax', 'nanmean']
+
+# Prepare data components
+glycan_keys = list(glycan_dict.keys())
+unique_lectin_names = list(set(lectin_keys.values()))
+
+# Filter lectins to only those present in binding data
+filtered_lectins = [lectin for lectin in lectins_filt.keys() if lectin in binding_data.columns]
+all_lectins = [lectin for lectin in lectins.keys() if lectin in binding_data.columns]
 
 """
-agg_list = [np.nansum, np.nanmax, np.nanmean]
-agg_n = ['nansum', 'nanmax', 'nanmean']
+Analysis 1: Filtered Lectins - varies first-level aggregation (agg1)
+Uses fixed second-level aggregation (np.nansum)
+"""
+sasa_filtered = {}
+flex_filtered = {}
 
-
-sasa_filt = {}
-flex_filt = {}
-x = list(glycan_dict.keys())
-y = list(set(list(lectin_keys.values()))) # set to remove duplicates
-found_lectins = [lectin for lectin in y if lectin in binding_data.columns]
-
-
-for i, name in zip(agg_list, agg_n):
-    sasa_corr, flex_corr = get_correlations_(
-        lectins_filt.keys(), #subest of lectins
+print("=== Filtered Lectins Analysis ===")
+for agg_func, agg_name in zip(agg_functions, agg_labels):
+    # Calculate correlations with varying first-level aggregation
+    sasa_corr, flex_corr = get_correlations5(
+        filtered_lectins,
         glycan_dict,
-        binding_data.loc[x, binding_data.columns],
-        #binding_data.loc[x, found_lectins],
-        agg1=i,
-        agg2=np.nansum)
+        binding_data.loc[glycan_keys, filtered_lectins],
+        agg1=np.nanmean,  # Vary this aggregation
+        agg2=np.nansum  # Keep this fixed
+    )
 
-    sasa_filt[name] = sasa_corr
-    flex_filt[name] = flex_corr
+    # Store results
+    sasa_filtered[agg_name] = sasa_corr
+    flex_filtered[agg_name] = flex_corr
 
-    print(name)
-    sasa_filt_abs_median = float(sasa_corr.abs().median())
-    print(f"sasa_filt_abs_median : {sasa_filt_abs_median:.2f}")
-    flex_filt_abs_median = float(flex_corr.abs().median())
-    print(f"flex_filt_abs_median: {flex_filt_abs_median:.2f}")
-    print("")
 
-plot_correlation_boxplot(sasa_filt, flex_filt, "Correlation Distribution Filtered Lectins")
-plt.savefig("results/plots/correlation_boxplot_filtered_lectins.png", dpi=300)
-plt.show()
+    # Print metrics
+    print(f"Using {agg_name} for first-level aggregation:")
+    print(f"  SASA correlation: {float(sasa_corr.abs().median()):.2f}")
+    print(f"  Flexibility correlation: {float(flex_corr.abs().median()):.2f}")
 
 """
-all Lectins
-agg1 = fixed
-agg2 = variable #max won!
+Analysis 2: All Lectins - uses fixed first-level aggregation (np.nansum)
+Varies second-level aggregation (agg2)
 """
-
-
 sasa_all = {}
 flex_all = {}
 
-for i, name in zip(agg_list, agg_n):
-    sasa_corr, flex_corr = get_correlations_(
-        lectins,
+print("\n=== All Lectins Analysis ===")
+for agg_func, agg_name in zip(agg_functions, agg_labels):
+    # Calculate correlations with varying second-level aggregation
+    sasa_corr, flex_corr = get_correlations5(
+        all_lectins,
         glycan_dict,
-        #binding_data.loc[list(glycan_dict.keys()), binding_data.columns],
-        binding_data.loc[x, found_lectins],
-        agg1=np.nansum,
-        agg2=i)
+        binding_data.loc[glycan_keys, all_lectins],
+        agg1=np.nanmean,
+        agg2=agg_func  # Vary this aggregation
+    )
 
-    sasa_all[name] = sasa_corr
-    flex_all[name] = flex_corr
+    # Store results
+    sasa_all[agg_name] = sasa_corr
+    flex_all[agg_name] = flex_corr
+
+    # Print metrics
+    print(f"Using {agg_name} for second-level aggregation:")
+    print(f"  SASA correlation: {float(sasa_corr.abs().median()):.2f}")
+    print(f"  Flexibility correlation: {float(flex_corr.abs().median()):.2f}")
 
 
-    print(name)
-    sasa_all_abs_median = float(sasa_corr.abs().median()    )
-    print(f"sasa_all_abs_median: {sasa_all_abs_median:.2f}")
-    flex_all_abs_median = float (flex_corr.abs().median()   )
-    print(f"flex_all_abs_median: {flex_all_abs_median:.2f}")
-    print("")
+def perform_t_test(data_dict):
+    keys = list(data_dict.keys())  # Get the keys (aggregation labels)
+    combinations = list(itertools.combinations(keys, 2))  # Generate combinations of keys
 
-plot_correlation_boxplot(sasa_all, flex_all, "Correlation Distribution all Lectins")
-plt.savefig("results/plots/correlation_boxplot_all_lectins.png", dpi=300)
-plt.show()
+    for comb in combinations:
+        key1, key2 = comb
+
+        # Get the DataFrames for each key
+        df1, df2 = data_dict[key1], data_dict[key2]
+
+        # Convert to numeric values correctly
+        # Extract the first column if it's a DataFrame before applying to_numeric
+        df1_clean = pd.to_numeric(df1.iloc[:, 0].dropna(), errors='coerce').values
+        df2_clean = pd.to_numeric(df2.iloc[:, 0].dropna(), errors='coerce').values
+
+
+        # Remove any rows where either array has NaN
+        mask = ~np.isnan(df1_clean) & ~np.isnan(df2_clean)
+        df1_clean = df1_clean[mask]
+        df2_clean = df2_clean[mask]
+
+        print(f"  Final number of paired values: {len(df1_clean)}")
+
+        # Check if there's enough data to perform the t-test
+        if len(df1_clean) > 1 and np.nanstd(df1_clean) > 0 and np.nanstd(df2_clean) > 0:
+            # Perform paired t-test
+            t_stat, p_value = stats.ttest_rel(df1_clean, df2_clean)
+
+            print(f"T-test for {key1} vs {key2}:")
+            print(f"  t-statistic: {t_stat:.3f}")
+            print(f"  p-value: {p_value:.3f}")
+        else:
+            print(f"Cannot perform t-test: insufficient data or zero variance")
+    else:
+        print(f"Not enough valid data for {key1} vs {key2}")
+    print()
+
+# Call the function to perform t-tests
+perform_t_test(sasa_filtered) # sum , mean
+#perform_t_test(flex_filtered)
