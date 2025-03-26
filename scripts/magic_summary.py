@@ -294,7 +294,6 @@ lectin_binding_motif = {
     }
 }
 lectin_keys= {
-    "LTL": "LTL",
     "PTL-I": "PTL-I",
     "MAL": "MAL-I",
     "BPL": "BPL",

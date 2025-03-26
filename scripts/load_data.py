@@ -4,9 +4,11 @@ import glycontact
 import pandas as pd
 import networkx as nx
 
+
 BINDING_DATA_PATH_v3 = '/Users/xakdze/PycharmProjects/G-look-like/data/20250216_glycan_binding.csv'
 BINDING_DATA_PATH_v2 = '/Users/xakdze/PycharmProjects/G-look-like/data/20241206_glycan_binding.csv'  # seq,protein
 
+BINDING_DATA_PATH_v4 = "/Users/xakdze/PycharmProjects/G-look-like/data/20250314_glycan_binding_processed.csv"
 
 
 def load_data_pdb():
@@ -14,8 +16,7 @@ def load_data_pdb():
     with pkg_resources.files(glycontact).joinpath("glycan_graphs.pkl").open("rb") as f:
         return pickle.load(f)
 
-
-def load_data():
+def load_data_v3():
     """Load glycan flexibility and binding data, process graphs, and return results."""
     flex_data = load_data_pdb()
     invalid_graphs = [glycan for glycan in flex_data if not isinstance(flex_data[glycan], nx.Graph)]
@@ -47,3 +48,10 @@ def load_data():
 
     return flex_data, binding_df, invalid_graphs
 
+def load_data_v4():
+    """Load glycan flexibility and binding data, process graphs, and return results."""
+    flex_data = load_data_pdb()
+    invalid_graphs = [glycan for glycan in flex_data if not isinstance(flex_data[glycan], nx.Graph)]
+    binding_df = pd.read_csv(BINDING_DATA_PATH_v4)
+
+    return flex_data, binding_df, invalid_graphs
