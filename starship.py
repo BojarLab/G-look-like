@@ -8,6 +8,7 @@ from scipy import stats
 from glycowork.motif.processing import get_class
 import seaborn as sns
 import matplotlib.pyplot as plt
+from glycowork.glycan_data.loader import lectin_specificity
 
 
 lectin_binding_motif = {
@@ -126,15 +127,13 @@ lectin_binding_motif = {
 
     "PTL-I": {
         "motif": ["Fuc(a1-2)[GalNAc(a1-3)]Gal", "Fuc(a1-2)[Gal(a1-3)]Gal"],
-        "termini_list": [["t", "t", "f"], ["t", "t", "f"]] #double t?
-        #"termini_list": [["t", "f", "f"], ["t", "f", "f"]]  # double t?
+        "termini_list": [["t", "t", "f"], ["t", "t", "f"]]
 
     },
 
     "PTA-I": {
         "motif": ["Fuc(a1-2)[GalNAc(a1-3)]Gal", "Fuc(a1-2)[Gal(a1-3)]Gal"],
         "termini_list": [["t", "t", "f"], ["t", "t", "f"]]
-      #  "termini_list": [["t", "f", "f"], ["t", "f", "f"]]  # double t?
 
     },
 
@@ -307,7 +306,8 @@ lectin_binding_motif = {
         "termini_list": [["t"], ["t", "f"]]
     }
 }
-lectin_keys= {
+lectin_keys = {
+    # Original entries
     "PTL-I": "PTL-I",
     "MAL": "MAL-I",
     "BPL": "BPL",
@@ -380,7 +380,141 @@ lectin_keys= {
     "SBA": "SBA",
     "VVA": "VVL",
     "WFA": "WFL",
-    "WFL": "WFL"
+    "WFL": "WFL",
+
+    # Additional entries from the list
+    "ACL": "ACA",
+    "Banana": "BanLec",
+    "BanLec": "BanLec",
+    "BambL": "BambL",
+    "BC2L-A": "BC2L-A",
+    "BC2LA": "BC2L-A",
+    "BC2L-CN": "BC2L-CN",
+    "BC2LCN": "BC2L-CN",
+    "BDA": "BDA",
+    "Calsepa": "Calsepa",
+    "Cal sep A": "Calsepa",
+    "Cholera toxin": "CTB",
+    "Cholera toxin B": "CTB",
+    "Con A": "ConA",
+    "Concanavalin A": "ConA",
+    "CVN": "CVN",
+    "Cyanovirin-N": "CVN",
+    "diCBM40": "diCBM40",
+    "DSA": "DSA",
+    "DSL": "DSA",
+    "ECL": "ECL",
+    "EEA": "EEA",
+    "EEL": "EEA",
+    "F17G": "F17G",
+    "F17aG": "F17G",
+    "F17bG": "F17G",
+    "F17dG": "F17G",
+    "F17eG": "F17G",
+    "F17fG": "F17G",
+    "GafD": "F17G",
+    "GHA": "GHA",
+    "GRFT": "GRFT",
+    "griffithsin": "GRFT",
+    "mGRFT": "GRFT",
+    "GS I": "GS-I",
+    "GSL I": "GS-I",
+    "GSL-IB4": "GS-I",
+    "GSL IB4": "GS-I",
+    "GSL-I B4": "GS-I",
+    "GS II": "GS-II",
+    "GSL II": "GS-II",
+    "AL": "HHL",
+    "HPL": "HPA",
+    "LBA": "LBA",
+    "LBL": "LBA",
+    "Lotus": "LTA",
+    "MAA-I": "MAL-I",
+    "MAA I": "MAL-I",
+    "MAL I": "MAL-I",
+    "MAA-II": "MAL-II",
+    "MAA II": "MAL-II",
+    "MAL II": "MAL-II",
+    "MNA-G": "MNA-G",
+    "MNA G": "MNA-G",
+    "MNA M": "MNA-M",
+    "MPL": "MPA",
+    "OSA": "OSA",
+    "OSL": "OSA",
+    "Orysata": "OSA",
+    "PA IL": "PA-IL",
+    "Lec A": "PA-IL",
+    "PA-IIL": "PA-IIL",
+    "PA IIL": "PA-IIL",
+    "LecB": "PA-IIL",
+    "Lec B": "PA-IIL",
+    "PHA": "PHA",
+    "PHA-M": "PHA",
+    "PHA M": "PHA",
+    "PHA-P": "PHA",
+    "PHA P": "PHA",
+    "Blackbean": "PHA",
+    "PHA-E": "PHA-E",
+    "PHA E": "PHA-E",
+    "E-PHA": "PHA-E",
+    "E PHA": "PHA-E",
+    "PHA-L": "PHA-L",
+    "PHA L": "PHA-L",
+    "L-PHA": "PHA-L",
+    "L PHA": "PHA-L",
+    "PhoSL": "PhoSL",
+    "PEA": "PSA",
+    "PSL1a": "PSL",
+    "PTA I": "PTL-I",
+    "PTA-GalNAc": "PTL-I",
+    "PTA GalNAc": "PTL-I",
+    "PTL I": "PTL-I",
+    "PTL-GalNAc": "PTL-I",
+    "PTL GalNAc": "PTL-I",
+    "WBA-I": "PTL-I",
+    "WBA I": "PTL-I",
+    "PTA II": "PTL-II",
+    "PTA-Gal": "PTL-II",
+    "PTA Gal": "PTL-II",
+    "PTL II": "PTL-II",
+    "PTL-Gal": "PTL-II",
+    "PTL Gal": "PTL-II",
+    "WBA-II": "PTL-II",
+    "WBA II": "PTL-II",
+    "PWL": "PWA",
+    "RCA 120": "RCA-I",
+    "RCA I": "RCA-I",
+    "Ricin B chain": "RCA-II",
+    "Ricin B": "RCA-II",
+    "RCA II": "RCA-II",
+    "RCA-II": "RCA-II",
+    "RCA60": "RCA-II",
+    "RCA-60": "RCA-II",
+    "Ricin": "RCA-II",
+    "RPA": "RPA",
+    "RPL": "RPA",
+    "RSL": "RSL",
+    "RS-IL": "RSL",
+    "RS IL": "RSL",
+    "RS-Fuc": "RSL",
+    "RS-IIL": "RS-IIL",
+    "RS IIL": "RS-IIL",
+    "SBL": "SBA",
+    "SLBR-B": "SLBR-B",
+    "SLBR-H": "SLBR-H",
+    "SLBR-N": "SLBR-N",
+    "SNA-II": "SNA-II",
+    "SNA II": "SNA-II",
+    "SSA": "SSA",
+    "SSL": "SSA",
+    "PL": "STL",
+    "SVN": "SVN",
+    "Scytovirin": "SVN",
+    "TJA I": "TJA-I",
+    "UEA": "UEA-I",
+    "UEA I": "UEA-I",
+    "UEA II": "UEA-II",
+    "WGL": "WGA"
 }
 
 structure_graphs, glycan_binding, invalid_graphs = load_data_v4()
@@ -495,6 +629,13 @@ def plot_correlation(lectin_name, binding_data, filepath=''):
     plt.savefig(filepath, format='pdf', bbox_inches='tight')
   return fig, ax1, ax2
 
-for i in lectins:
-  plot_correlation(i, binding_data_filt, f'results/plots/{i}.pdf')
+"""for l in lectin_specificity["abbreviation"]:
+        if l in binding_data.columns:
+            plot_correlation(l, binding_data_filt, f'results/plots/{l}.pdf')"""
 
+for row in lectin_specificity["abbreviation"]:
+    for l in row.split(","):
+        l = l.strip()
+        if l not in lectin_binding_motif.keys():
+            print(l)
+            continue
