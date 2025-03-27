@@ -4,9 +4,11 @@ from scripts.load_data import load_data_v4
 import pandas as pd
 import numpy as np
 from glycowork.glycan_data.loader import unwrap
-
-
+from scipy import stats
+from glycowork.motif.processing import get_class
+import seaborn as sns
 import matplotlib.pyplot as plt
+
 
 lectin_binding_motif = {
     "AOL": {"motif": ["Fuc(a1-?)"],
@@ -417,17 +419,16 @@ def get_correlations(lectins, glycan_dict, binding_data, agg1=np.nanmean, agg2=n
 
 
 sasa_corr, flex_corr = zip(*[get_correlations(lectins, glycan_dict, binding_data_filt, agg2=k) for k in [np.nansum, np.nanmax, np.nanmean]])
+
 sasa_corr = pd.concat(sasa_corr, axis=1)
 sasa_corr.columns = ['sum', 'max', 'mean']
 flex_corr = pd.concat(flex_corr, axis=1)
 flex_corr.columns = ['sum', 'max', 'mean']
 
-from scipy import stats
-from glycowork.motif.processing import get_class
-import seaborn as sns
 
 def plot_correlation(lectin_name, binding_data, filepath=''):
-  p_value= 1.0
+  p_value_f = 1.0
+  p_value_s = 1.0
   sasa_df, flex_df = pd.DataFrame(index=glycan_dict.keys()), pd.DataFrame(index=glycan_dict.keys())
   binding_motif = lectin_binding_motif[lectin_name]
   motif_graphs = [glycan_to_nxGraph(binding_motif['motif'][i], termini='provided', termini_list=binding_motif['termini_list'][i]) for i in range(len(binding_motif['motif']))]
@@ -439,12 +440,14 @@ def plot_correlation(lectin_name, binding_data, filepath=''):
     matches_unwrapped = unwrap(matches)
     all_sasa.append(np.nanmean([np.nanmean([ggraph.nodes()[n].get('SASA', np.nan) for n in m]) for m in matches_unwrapped]) if matches_unwrapped else np.nan)
     all_flex.append(np.nanmean([np.nanmean([ggraph.nodes()[n].get('flexibility', np.nan) for n in m]) for m in matches_unwrapped]) if matches_unwrapped else np.nan)
+
   sasa_df['SASA'] = all_sasa
   flex_df['flexibility'] = all_flex
   sasa_df['binding'] = binding_data[lectin_name]
   flex_df['binding'] = binding_data[lectin_name]
   sasa_df['motif'] = [binding_motif['motif'][i] if i is not None else 'None' for i in motif_indices]
   flex_df['motif'] = [binding_motif['motif'][i] if i is not None else 'None' for i in motif_indices]
+
   # Create the figure and subplots
   classes = [get_class(g) if get_class(g) else 'other' for g in glycan_dict]
   sasa_df['class'] = classes
@@ -455,11 +458,12 @@ def plot_correlation(lectin_name, binding_data, filepath=''):
   sns.scatterplot(x='SASA', y='binding', hue='class', style='motif', data=clean_sasa, ax=ax1,
   hue_order = ['N', 'O', "lipid/free", ""],
   palette = "tab10")
+
   # Regression with confidence interval using seaborn
   if len(clean_sasa) > 1:
     sns.regplot(x='SASA', y='binding', data=clean_sasa, ax=ax1, scatter=False, color='r', ci=95)
-    slope, intercept, r_value, p_value, std_err = stats.linregress(clean_sasa['SASA'], clean_sasa['binding'])
-    ax1.text(0.05, 0.95, f'y = {slope:.3f}x + {intercept:.3f}\nr = {r_value:.3f}, p = {p_value:.3f}',
+    slope, intercept, r_value, p_value_s, std_err = stats.linregress(clean_sasa['SASA'], clean_sasa['binding'])
+    ax1.text(0.05, 0.95, f'y = {slope:.3f}x + {intercept:.3f}\nr = {r_value:.3f}, p = {p_value_s:.3f}',
            transform=ax1.transAxes, verticalalignment='top')
   ax1.set_title(f'SASA vs Binding for {lectin_name}')
   ax1.set_xlabel('SASA')
@@ -475,8 +479,8 @@ def plot_correlation(lectin_name, binding_data, filepath=''):
   # Regression with confidence interval using seaborn
   if len(clean_flex) > 1:
     sns.regplot(x='flexibility', y='binding', data=clean_flex, ax=ax2, scatter=False, color='r', ci=95)
-    slope, intercept, r_value, p_value, std_err = stats.linregress(clean_flex['flexibility'], clean_flex['binding'])
-    ax2.text(0.05, 0.95, f'y = {slope:.3f}x + {intercept:.3f}\nr = {r_value:.3f}, p = {p_value:.3f}',
+    slope, intercept, r_value, p_value_f, std_err = stats.linregress(clean_flex['flexibility'], clean_flex['binding'])
+    ax2.text(0.05, 0.95, f'y = {slope:.3f}x + {intercept:.3f}\nr = {r_value:.3f}, p = {p_value_f:.3f}',
            transform=ax2.transAxes, verticalalignment='top')
   ax2.set_title(f'Flexibility vs Binding for {lectin_name}')
   ax2.set_xlabel('Flexibility')
@@ -485,10 +489,12 @@ def plot_correlation(lectin_name, binding_data, filepath=''):
   handles, labels = ax2.get_legend_handles_labels()
   ax2.legend(handles, labels, title='Class & Motif', bbox_to_anchor=(1.05, 1), loc='upper left')
   plt.tight_layout()
+
   # Save figure if filepath is provided
-  if filepath and p_value < 0.05:
+  if filepath and p_value_s < 0.05 or p_value_f < 0.05:
     plt.savefig(filepath, format='pdf', bbox_inches='tight')
   return fig, ax1, ax2
 
 for i in lectins:
   plot_correlation(i, binding_data_filt, f'results/plots/{i}.pdf')
+
