@@ -9,6 +9,9 @@ from glycowork.motif.processing import get_class
 import seaborn as sns
 import matplotlib.pyplot as plt
 from glycowork.glycan_data.loader import lectin_specificity
+from adjustText import adjust_text
+import warnings
+warnings.filterwarnings("ignore")
 
 
 lectin_binding_motif = {
@@ -559,3 +562,84 @@ for l in lectin_binding_motif:
         if l in  binding_data_filt.columns:
             plot_correlation(l, binding_data_filt, f'results/plots/{l}.pdf')
 
+
+
+def plot_correlation_scatter(out, filepath=''):
+  def assign_quadrant(row):
+    if row["SASA_corr"] >= 0 and row["flex_corr"] >= 0:
+      return "Q1: High SASA, High Flex", "darkgreen"
+    elif row["SASA_corr"] < 0 and row["flex_corr"] >= 0:
+      return "Q2: Low SASA, High Flex", "royalblue"
+    elif row["SASA_corr"] < 0 and row["flex_corr"] < 0:
+      return "Q3: Low SASA, Low Flex", "darkred"
+    else:
+      return "Q4: High SASA, Low Flex", "darkorange"
+  out["quadrant"], out["color"] = zip(*out.apply(assign_quadrant, axis=1))
+  fig, ax = plt.subplots(figsize=(12, 10))
+  scatter = sns.scatterplot(
+    x="SASA_corr",
+    y="flex_corr",
+    data=out,
+    s=100,
+    hue="quadrant",
+    palette=dict(zip(out["quadrant"].unique(), out["color"].unique())),
+    ax=ax
+  )
+  plt.axhline(y=0, color='gray', linestyle='--', alpha=0.5)
+  plt.axvline(x=0, color='gray', linestyle='--', alpha=0.5)
+  plt.title("Correlation between SASA and Flexibility", fontsize=14)
+  plt.xlabel("SASA Correlation", fontsize=12)
+  plt.ylabel("Flexibility Correlation", fontsize=12)
+  plt.grid(True, alpha=0.3)
+  texts = []
+  for idx, row in out.iterrows():
+    texts.append(ax.annotate(
+      idx,
+      (row["SASA_corr"], row["flex_corr"]),
+      fontsize=10,
+      fontweight="bold",
+      color=row["color"]
+    ))
+  adjust_text(texts, arrowprops=dict(arrowstyle="-", color="gray", alpha=0.5))
+  ax.fill_between([-1, 0], 0, 1, alpha=0.1, color="royalblue")
+  ax.fill_between([0, 1], 0, 1, alpha=0.1, color="darkgreen")
+  ax.fill_between([-1, 0], -1, 0, alpha=0.1, color="darkred")
+  ax.fill_between([0, 1], -1, 0, alpha=0.1, color="darkorange")
+  ax.set_xlim(-0.8, 1.1)
+  ax.set_ylim(-0.8, 1.1)
+  plt.legend(title="Quadrants", loc="best", framealpha=0.9)
+  corr_coef = np.corrcoef(out["SASA_corr"], out["flex_corr"])[0, 1]
+  ax.annotate(
+    f"Correlation: {corr_coef:.2f}",
+    xy=(0.05, 0.95),
+    xycoords="axes fraction",
+    bbox=dict(boxstyle="round,pad=0.5", fc="white", alpha=0.8),
+    fontsize=12
+  )
+  plt.tight_layout()
+  if filepath:
+    plt.savefig(filepath, format='pdf', bbox_inches='tight')
+  return fig, ax
+
+
+
+def get_lectin_clusters(binding_data, filepath='', agg1=np.nanmean, agg2=np.nanmean):
+  sasa_df, flex_df = pd.DataFrame(index=glycan_dict.keys()), pd.DataFrame(index=glycan_dict.keys())
+  for lectin in binding_data.columns:
+    binding_motif = lectin_binding_motif[lectin]
+    motif_graphs = [glycan_to_nxGraph(binding_motif['motif'][i], termini='provided', termini_list=binding_motif['termini_list'][i]) for i in range(len(binding_motif['motif']))]
+    all_sasa, all_flex = [], []
+    for _, ggraph in glycan_dict.items():
+      _, matches = zip(*[subgraph_isomorphism(ggraph, motif_graph, return_matches=True) for motif_graph in motif_graphs])
+      matches_unwrapped = unwrap(matches)
+      all_sasa.append(agg2([agg1([ggraph.nodes()[n].get('SASA', np.nan) for n in m]) for m in matches_unwrapped]) if matches_unwrapped else np.nan)
+      all_flex.append(agg2([agg1([ggraph.nodes()[n].get('flexibility', np.nan) for n in m]) for m in matches_unwrapped]) if matches_unwrapped else np.nan)
+    sasa_df[lectin] = all_sasa
+    flex_df[lectin] = all_flex
+  sasa_corr = sasa_df.corrwith(binding_data)
+  flex_corr = flex_df.corrwith(binding_data)
+  out = pd.concat([sasa_corr, flex_corr], axis=1)
+  out.columns = ['SASA_corr', 'flex_corr']
+  plot_correlation_scatter(out.dropna(), filepath=filepath)
+
+get_lectin_clusters(binding_data_filt, filepath='results/plots/cluster.pdf')
