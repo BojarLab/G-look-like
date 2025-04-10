@@ -356,6 +356,90 @@ lectin_binding_motif = {
         "motif": ["GalNAc(a1-?)", ],
         "termini_list": [["t"]]
     },
+
+    #more
+
+"AIA": {
+    "motif": ["Gal"],
+    "termini_list": [["t"]]
+  },
+  "PL": {
+    "motif": ["GlcNAc"],
+    "termini_list": [["t"]]
+  },
+  "BPA": {
+    "motif": ["Gal"],
+    "termini_list": [["t"]]
+  },
+  "ECA": {
+    "motif": ["Gal", "GalNAc"],
+    "termini_list": [["t"], ["t"]]
+  },
+  "VVA": {
+    "motif": ["GalNAc"],
+    "termini_list": [["t"]]
+  },
+  "DC-SIGN": {
+    "motif": ["Man"],
+    "termini_list": [["t"]]
+  },
+  "LCA": {
+    "motif": ["Glc", "Man"],
+    "termini_list": [["t"], ["t"]]
+  },
+  "ACG": {
+    "motif": ["Gal"],
+    "termini_list": [["t"]]
+  },
+  "Artocarpin": {
+    "motif": ["Glc", "Man"],
+    "termini_list": [["t"], ["t"]]
+  },
+  "Heltuba": {
+    "motif": ["Glc", "Man"],
+    "termini_list": [["t"], ["t"]]
+  },
+  "CRLL": {
+    "motif": ["Man"],
+    "termini_list": [["t"]]
+  },
+  "GS-II": {
+    "motif": ["GlcNAc"],
+    "termini_list": [["t"]]
+  },
+  "CEL-IV": {
+    "motif": ["Gal", "GalNAc"],
+    "termini_list": [["t"], ["t"]]
+  },
+  "ConA": {
+    "motif": ["Glc", "Man"],
+    "termini_list": [["t"], ["t"]]
+  },
+  "DBA": {
+    "motif": ["Gal", "GalNAc"],
+    "termini_list": [["t"], ["t"]]
+  },
+  "PHA-E": {
+    "motif": ["GalNAc"],
+    "termini_list": [["t"]]
+  },
+  "CCA": {
+    "motif": ["Glc", "Man"],
+    "termini_list": [["t"], ["t"]]
+  },
+  "LSECtin": {
+    "motif": ["Man"],
+    "termini_list": [["t"]]
+  },
+  "BRA3": {
+    "motif": ["Gal", "Man"],
+    "termini_list": [["t"], ["t"]]
+  },
+  "BRA2": {
+    "motif": ["Gal", "Man"],
+    "termini_list": [["t"], ["t"]]
+  }
+
 }
 
 lectin_keys = {
@@ -443,10 +527,103 @@ lectin_keys = {
     "RCA-60": "RCA-II",
     "Ricin": "RCA-II",
     "ASA ": "ASA",
+#more
+  # Jacalin/Artocarpus group
+  "Artocarpus Integrifolia Agglutinin": "AIA",
+  "AIA": "AIA",
 
+  # PL group
+  "PL": "PL",
+  "STL": "PL",
+  "Solanum Tuberosum Lectin": "PL",
+
+  # BPA group
+  "BPA": "BPA",
+  "BPL": "BPA",
+  "Bauhinia Purpurea Lectin": "BPA",
+
+  # ECA group
+  "ECA": "ECA",
+  "ECL": "ECA",
+  "Erythrina Crista-galli Lectin": "ECA",
+
+  # VVA group
+  "VVA": "VVA",
+  "VVL": "VVA",
+  "VVA-G": "VVA",
+  "Vicia Villosa Lectin": "VVA",
+
+  # DC-SIGN group
+  "DC-SIGN": "DC-SIGN",
+  "LSECtin CRD Fc": "DC-SIGN",
+
+  # LCA group
+  "LCA": "LCA",
+  "LcH": "LCA",
+  "Lens Culinaris Agglutinin": "LCA",
+
+  # ACG group
+  "ACG": "ACG",
+  "Agrocybe Cylindracea Galectin": "ACG",
+
+  # Artocarpin group
+  "Artocarpin": "Artocarpin",
+  "Mannose-specific lectin KM+": "Artocarpin",
+
+  # Heltuba group
+  "Heltuba": "Heltuba",
+  "Lectin 1": "Heltuba",
+
+  # CRLL group
+  "CRLL": "CRLL",
+
+  # GS-II group
+  "GS-II": "GS-II",
+  "GSL-II": "GS-II",
+  "Griffonia Simplicifolia Lectin 2": "GS-II",
+  "Insecticidal N-acetylglucosamine-specific lectin (Fragment)": "GS-II",
+
+  # CEL-IV group
+  "CEL-IV": "CEL-IV",
+  "Lectin CEL-IV, C-type": "CEL-IV",
+
+  # ConA group
+  "Canavalia Ensiformis Agglutinin": "ConA",
+  "ConA": "ConA",
+  "Concanavalin-A": "ConA",
+
+  # DBA group
+  "DBA": "DBA",
+  "DBL": "DBA",
+  "Dolichos Biflorus Agglutinin": "DBA",
+  "Seed lectin subunit I": "DBA",
+
+  # PHA-E group
+  "PHA-E": "PHA-E",
+  "Phaseolus Vulgaris Erythroagglutinin": "PHA-E",
+  "Erythroagglutinating phytohemagglutinin": "PHA-E",
+
+  # CCA group
+  "CCA": "CCA",
+  "Agglutinin": "CCA",
+
+  # LSECtin group
+  "LSECtin": "LSECtin",
+
+  # BRA-2 group
+  "BRA-2": "BRA2",
+  "BRA2": "BRA2",
+  "Lectin BRA-2": "BRA2",
+
+  # BRA-3 group
+  "BRA-3": "BRA3",
+  "BRA3": "BRA3",
+  "Lectin BRA-3": "BRA3"
 }
 
+
 structure_graphs, glycan_binding, invalid_graphs = load_data_v4()
+oracle= pd.read_csv('data/all_meta.csv')
 
 binding_data = glycan_binding.set_index('protein').drop(['target'], axis=1)
 idx = [k for k in binding_data.index if k in lectin_keys]
@@ -488,7 +665,7 @@ sasa_corr.columns = ['sum', 'max', 'mean']
 flex_corr = pd.concat(flex_corr, axis=1)
 flex_corr.columns = ['sum', 'max', 'mean']
 
-
+"""
 def plot_correlation(lectin_name, binding_data, filepath=''):
   p_value_f = 1.0
   p_value_s = 1.0
@@ -562,8 +739,6 @@ for l in lectin_binding_motif:
         if l in  binding_data_filt.columns:
             plot_correlation(l, binding_data_filt, f'results/plots/{l}.pdf')
 
-
-
 def plot_correlation_scatter(out, filepath=''):
   def assign_quadrant(row):
     if row["SASA_corr"] >= 0 and row["flex_corr"] >= 0:
@@ -621,8 +796,6 @@ def plot_correlation_scatter(out, filepath=''):
     plt.savefig(filepath, format='pdf', bbox_inches='tight')
   return fig, ax
 
-
-
 def get_lectin_clusters(binding_data, filepath='', agg1=np.nanmean, agg2=np.nanmean):
   sasa_df, flex_df = pd.DataFrame(index=glycan_dict.keys()), pd.DataFrame(index=glycan_dict.keys())
   for lectin in binding_data.columns:
@@ -642,4 +815,139 @@ def get_lectin_clusters(binding_data, filepath='', agg1=np.nanmean, agg2=np.nanm
   out.columns = ['SASA_corr', 'flex_corr']
   plot_correlation_scatter(out.dropna(), filepath=filepath)
 
-get_lectin_clusters(binding_data_filt, filepath='results/plots/cluster.pdf')
+get_lectin_clusters(binding_data_filt, filepath='results/plots/cluster.pdf')"""
+
+
+def get_lectin_clusters(binding_data, oracle, filepath='', agg1=np.nanmean, agg2=np.nanmean):
+    sasa_df, flex_df = pd.DataFrame(index=glycan_dict.keys()), pd.DataFrame(index=glycan_dict.keys())
+    for lectin in binding_data.columns:
+        binding_motif = lectin_binding_motif[lectin]
+        motif_graphs = [glycan_to_nxGraph(binding_motif['motif'][i], termini='provided',
+                                          termini_list=binding_motif['termini_list'][i]) for i in
+                        range(len(binding_motif['motif']))]
+        all_sasa, all_flex = [], []
+        for _, ggraph in glycan_dict.items():
+            _, matches = zip(
+                *[subgraph_isomorphism(ggraph, motif_graph, return_matches=True) for motif_graph in motif_graphs])
+            matches_unwrapped = unwrap(matches)
+            all_sasa.append(agg2([agg1([ggraph.nodes()[n].get('SASA', np.nan) for n in m]) for m in
+                                  matches_unwrapped]) if matches_unwrapped else np.nan)
+            all_flex.append(agg2([agg1([ggraph.nodes()[n].get('flexibility', np.nan) for n in m]) for m in
+                                  matches_unwrapped]) if matches_unwrapped else np.nan)
+        sasa_df[lectin] = all_sasa
+        flex_df[lectin] = all_flex
+    sasa_corr = sasa_df.corrwith(binding_data)
+    flex_corr = flex_df.corrwith(binding_data)
+    out = pd.concat([sasa_corr, flex_corr], axis=1)
+    out.columns = ['SASA_corr', 'flex_corr']
+
+    # Add lectin_class from oracle
+    lectin_classes = {}
+    for lectin in out.index:
+        # Check if the lectin index is in oracle's name column
+        matches = oracle[oracle["name"] == lectin]
+        if not matches.empty:
+            lectin_classes[lectin] = matches.iloc[0]["lectin_class"]
+        else:
+            lectin_classes[lectin] = "Unknown"
+
+    out['lectin_class'] = pd.Series(lectin_classes)
+
+    fig, ax = plot_correlation_scatter(out.dropna(), filepath=filepath)
+
+    return out, fig, ax  # Return the dataframe and plot objects
+
+
+def plot_correlation_scatter(out, filepath=''):
+    def assign_quadrant(row):
+        if row["SASA_corr"] >= 0 and row["flex_corr"] >= 0:
+            return "Q1: High SASA, High Flex", "darkgreen"
+        elif row["SASA_corr"] < 0 and row["flex_corr"] >= 0:
+            return "Q2: Low SASA, High Flex", "royalblue"
+        elif row["SASA_corr"] < 0 and row["flex_corr"] < 0:
+            return "Q3: Low SASA, Low Flex", "darkred"
+        else:
+            return "Q4: High SASA, Low Flex", "darkorange"
+
+    out["quadrant"], out["color"] = zip(*out.apply(assign_quadrant, axis=1))
+
+    # Create figure for main plot only
+    fig, ax = plt.subplots(figsize=(12, 10))
+
+    # Select color scheme - use lectin_class if available
+    if 'lectin_class' in out.columns and out['lectin_class'].nunique() > 1:
+        palette = plt.cm.tab10 if out['lectin_class'].nunique() <= 10 else plt.cm.tab20
+        colors = {cls: palette(i % palette.N) for i, cls in enumerate(out['lectin_class'].unique())}
+        hue_column = "lectin_class"
+        palette_arg = colors
+    else:
+        hue_column = "quadrant"
+        palette_arg = dict(zip(out["quadrant"].unique(), out["color"].unique()))
+
+    # Create scatter plot
+    sns.scatterplot(
+        x="SASA_corr", y="flex_corr", data=out, s=120,
+        hue=hue_column, palette=palette_arg, ax=ax,
+        legend=False  # No legend in the main plot
+    )
+
+    # Add plot elements
+    ax.axhline(y=0, color='gray', linestyle='--', alpha=0.5)
+    ax.axvline(x=0, color='gray', linestyle='--', alpha=0.5)
+    ax.set_title("Correlation between SASA and Flexibility", fontsize=16)
+    ax.set_xlabel("SASA Correlation", fontsize=14)
+    ax.set_ylabel("Flexibility Correlation", fontsize=14)
+    ax.grid(True, alpha=0.3)
+
+    # Add point labels
+    texts = [ax.annotate(idx, (row["SASA_corr"], row["flex_corr"]),
+                         fontsize=10, fontweight="bold", color='black')
+             for idx, row in out.iterrows()]
+    adjust_text(texts, arrowprops=dict(arrowstyle="-", color="gray", alpha=0.5))
+
+    # Add quadrant coloring
+    ax.fill_between([-1, 0], 0, 1, alpha=0.1, color="royalblue")
+    ax.fill_between([0, 1], 0, 1, alpha=0.1, color="darkgreen")
+    ax.fill_between([-1, 0], -1, 0, alpha=0.1, color="darkred")
+    ax.fill_between([0, 1], -1, 0, alpha=0.1, color="darkorange")
+    ax.set_xlim(-0.8, 1.1)
+    ax.set_ylim(-0.8, 1.1)
+
+    # Add correlation coefficient
+    corr_coef = np.corrcoef(out["SASA_corr"], out["flex_corr"])[0, 1]
+    ax.annotate(f"Correlation: {corr_coef:.2f}", xy=(0.05, 0.95), xycoords="axes fraction",
+                bbox=dict(boxstyle="round,pad=0.5", fc="white", alpha=0.8), fontsize=12)
+
+    # Finalize layout
+    plt.tight_layout()
+
+    # Save main plot
+    if filepath:
+        plt.savefig(filepath, format='pdf', bbox_inches='tight', dpi=300)
+
+    # Create and save legend as a separate file
+    if 'lectin_class' in out.columns and filepath:
+        legend_title = "Lectin Class" if 'lectin_class' in out.columns else "Quadrants"
+        legend_fig, legend_ax = plt.subplots(figsize=(3, 5))
+        legend_ax.axis('off')
+
+        # Create proxy artists for the legend
+        from matplotlib.lines import Line2D
+        legend_elements = []
+        for cls, color in colors.items():
+            legend_elements.append(Line2D([0], [0], marker='o', color='w', markerfacecolor=color,
+                                          markersize=10, label=cls))
+
+        # Add the legend to the new figure
+        legend = legend_ax.legend(handles=legend_elements, title=legend_title,
+                                  loc='center', fontsize=10, title_fontsize=12)
+
+        # Save legend figure
+        legend_filepath = filepath.replace('.pdf', '_legend.pdf')
+        legend_fig.tight_layout()
+        legend_fig.savefig(legend_filepath, format='pdf', bbox_inches='tight', dpi=300)
+        plt.close(legend_fig)
+
+    return fig, ax
+# Example usage
+out, fig, ax = get_lectin_clusters(binding_data_filt, oracle, filepath='results/plots/cluster_.pdf')

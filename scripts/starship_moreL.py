@@ -324,10 +324,11 @@ def plot_correlation(lectin_name, binding_data, filepath=''):
   ax2.legend(handles, labels, title='Class & Motif', bbox_to_anchor=(1.05, 1), loc='upper left')
   plt.tight_layout()
 
-  # Save figure if filepath is provided
+  sig= False
   if filepath and p_value_s < 0.05 or p_value_f < 0.05:
     plt.savefig(filepath, format='pdf', bbox_inches='tight')
-  return fig, ax1, ax2
+    sig = True
+  return fig, ax1, ax2, sig
 
 
 def plot_correlation_scatter(out, filepath=''):
@@ -407,10 +408,12 @@ def get_lectin_clusters(binding_data, filepath='', agg1=np.nanmean, agg2=np.nanm
   out.columns = ['SASA_corr', 'flex_corr']
   plot_correlation_scatter(out.dropna(), filepath=filepath)
 
-get_lectin_clusters(binding_data_filt, filepath='results/plots/dev/cluster.pdf')
+#get_lectin_clusters(binding_data_filt, filepath='results/plots/dev/cluster.pdf')
+
+for l in lectin_binding_motif:
+    if l in binding_data_filt.columns:
+        _, _,_ ,sig = plot_correlation(l, binding_data_filt, f'results/plots/dev/{l}.pdf')
+        if sig:
+            print(f"Significant correlation for {l}")
 
 
-"""for l in lectin_binding_motif:
-        if l in  binding_data_filt.columns:
-            plot_correlation(l, binding_data_filt, f'results/plots/dev/{l}.pdf')
-"""
